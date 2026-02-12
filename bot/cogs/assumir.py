@@ -1,0 +1,53 @@
+import discord
+from discord.ext import commands
+from bot.db import get_conn
+
+class Assumir(commands.Cog):
+    def __init__(self, bot):
+        self.bot = bot
+
+    @commands.hybrid_command(
+        name="assumir",
+        description="Assumir o ticket atual"
+    )
+    @commands.has_permissions(administrator=True)
+    async def assumir(self, ctx: commands.Context):
+        # verifica se é um ticket válido
+        conn = get_db_connection()
+        cur = conn.cursor()
+
+        cur.execute(
+            "SELECT id FROM tickets WHERE channel_id = %s",
+            (str(ctx.channel.id),)
+        )
+        result = cur.fetchone()
+
+        if not result:
+            if ctx.interaction:
+                await ctx.interaction.response.send_message(
+                    "<:Warning:1457445578593009734> | Amigão... bebeu foi? Esse canal não é um ticket.",
+                    ephemeral=True
+                )
+            else:
+                await ctx.send("<:Warning:1457445578593009734> | Amigão... bebeu foi? Esse canal não é um ticket.")
+            cur.close()
+            conn.close()
+            return
+
+        cur.close()
+        conn.close()
+
+        mensagem = (
+            f"<a:verificado:1458234566597804170> | **Ticket assumido**\n"
+            f"O administrador **{ctx.author.mention}** assumiu este ticket!\n"
+            f"Boa sorte no seu atendimento."
+        )
+
+        # separação correta entre slash e prefixo
+        if ctx.interaction:
+            await ctx.interaction.response.send_message(mensagem)
+        else:
+            await ctx.send(mensagem)
+
+async def setup(bot):
+    await bot.add_cog(Assumir(bot))
