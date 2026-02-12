@@ -44,4 +44,4 @@ class RizeBot(commands.Bot):
         print("------")
 
 bot = RizeBot()
-bot.run("MTQ1NzQxMjQ0NDg0NTY0MTgxMQ.GLR4SL.F5XBsO67u71DRxidMO7eQ6Y-oe3A52DyGlOgSQ")
+bot.run("MTQ1NzQxMjQ0NDg0NTY0MTgxMQ.GqnwYM.4r1-vVfwgHcwSYygn5GmrYMVh9j9YbA-9vH7fM")
