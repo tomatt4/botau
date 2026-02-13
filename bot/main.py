@@ -18,7 +18,7 @@ class RizeBot(commands.Bot):
             command_prefix=".",
             intents=intents,
             help_command=None,
-            activity=discord.Game(name="Lumi | /help")
+            activity=discord.Listening(name="resenha confirmada")
         )
 
     async def setup_hook(self):
@@ -34,6 +34,7 @@ class RizeBot(commands.Bot):
         await self.load_extension("cogs.gestao_staff")
         await self.load_extension("cogs.mensagem")
         await self.load_extension("cogs.embeds")
+        await self.load_extension("cogs.word_filter")
         print("Lumi: Cogs carregados")
         # Sync slash commands
         await self.tree.sync()
