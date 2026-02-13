@@ -45,4 +45,4 @@ class RizeBot(commands.Bot):
 
 keep_alive()
 bot = RizeBot()
-bot.run("MTQ1NzQxMjQ0NDg0NTY0MTgxMQ.GqnwYM.4r1-vVfwgHcwSYygn5GmrYMVh9j9YbA-9vH7fM")
+bot.run("MTQ1NzQxMjQ0NDg0NTY0MTgxMQ.Ge6IBE.fug7GebkRMVUUPE8y69qn4u7_cSsVa85ttCq80")
