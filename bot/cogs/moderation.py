@@ -95,7 +95,7 @@ class Moderation(commands.Cog):
     ):
         await user.kick(reason=reason)
         await ctx.send(
-            f"**{user.name}** foi expulso.\n📄 Motivo: {reason}"
+            f"**{user.name}** foi expulso. Motivo: {reason}"
         )
 
     # =====================
@@ -123,8 +123,7 @@ class Moderation(commands.Cog):
         await user.timeout(duration, reason=reason)
 
         await ctx.send(
-            f"**{user.name}** foi silenciado por **{time} minutos**!\n"
-            f"📄 Motivo: {reason}."
+            f"**{user.name}** foi silenciado por **{time} minutos**! Motivo: {reason}."
         )
 
     # =====================
@@ -161,7 +160,7 @@ class Moderation(commands.Cog):
             conn.close()
 
         await ctx.send(
-            f"**{user.name}** recebeu um warn\n📄 Motivo: {reason}"
+            f"O usuário **{user.name}** recebeu um warn! Motivo: {reason}"
         )
 
 
