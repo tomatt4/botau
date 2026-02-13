@@ -17,7 +17,7 @@ class RizeBot(commands.Bot):
             command_prefix=".",
             intents=intents,
             help_command=None,
-            activity=discord.Listening(name="resenha confirmada")
+            activity=discord.Game(name="resenha confirmada")
         )
 
     async def setup_hook(self):
