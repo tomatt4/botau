@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 from datetime import timedelta
-
+from db import get_conn
 class TicketView(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
