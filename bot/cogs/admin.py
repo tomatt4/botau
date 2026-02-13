@@ -13,20 +13,17 @@ class TicketView(discord.ui.View):
             discord.SelectOption(
                 label="Denunciar",
                 description="Reportar algo para a staff",
-                value="denúncia",
-                emoji=""
+                value="denúncia",                
             ),
             discord.SelectOption(
                 label="Sugestão",
                 description="Enviar uma ideia ou sugestão",
                 value="sugestão",
-                emoji=""
             ),
             discord.SelectOption(
                 label="Suporte",
                 description="Precisa de ajuda?",
                 value="suporte",
-                emoji=""
             ),
         ]
     )
