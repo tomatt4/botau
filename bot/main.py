@@ -10,7 +10,6 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 load_dotenv()
 
-
 class RizeBot(commands.Bot):
     def __init__(self):
         intents = discord.Intents.all()
@@ -46,4 +45,5 @@ class RizeBot(commands.Bot):
 
 keep_alive()
 bot = RizeBot()
-bot.run("MTQ1NzQxMjQ0NDg0NTY0MTgxMQ.G5I5RP.UeLD14OHfYhCjb1_KegwGETRV6a2E8e8tmexOg")
+TOKEN = os.getenv("DISCORD_TOKEN")
+bot.run(TOKEN)
