@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from keepalive import keep_alive
 
 # 👇 IMPORT DO BANCO
-from bot.db import init_db
+from db import init_db
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 load_dotenv()
