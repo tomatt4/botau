@@ -1,151 +1,182 @@
 import discord
 from discord.ext import commands
-from datetime import datetime, timedelta
+from datetime import datetime
 
 class Logs(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    # ========= CONFIG =========
     LOG_CHANNEL_ID = 1454971586758180907  # ID do canal de logs
-    ALT_DAYS_LIMIT = 3  # conta com menos de X dias = possível alt
+    ALT_DAYS_LIMIT = 3
 
-    def get_log_channel(self, guild):
+    def log_channel(self, guild):
         return guild.get_channel(self.LOG_CHANNEL_ID)
 
-    # ========= MENSAGEM DELETADA =========
+    # ===== MENSAGEM DELETADA =====
     @commands.Cog.listener()
     async def on_message_delete(self, message):
         if message.author.bot:
             return
 
-        channel = self.get_log_channel(message.guild)
+        channel = self.log_channel(message.guild)
         if not channel:
             return
 
-        await channel.send(
-            f"Mensagem deletada\n"
-            f"Autor: {message.author} ({message.author.id})\n"
-            f"Canal: {message.channel.mention}\n"
-            f"Conteúdo: {message.content}"
+        embed = discord.Embed(
+            title="Mensagem deletada",
+            color=discord.Color.red(),
+            timestamp=datetime.utcnow()
         )
+        embed.add_field(name="Autor", value=f"{message.author} ({message.author.id})", inline=False)
+        embed.add_field(name="Canal", value=message.channel.mention, inline=False)
+        embed.add_field(name="Conteúdo", value=message.content or "Sem conteúdo", inline=False)
 
-    # ========= MENSAGEM EDITADA =========
+        await channel.send(embed=embed)
+
+    # ===== MENSAGEM EDITADA =====
     @commands.Cog.listener()
     async def on_message_edit(self, before, after):
         if before.author.bot or before.content == after.content:
             return
 
-        channel = self.get_log_channel(before.guild)
+        channel = self.log_channel(before.guild)
         if not channel:
             return
 
-        await channel.send(
-            f"Mensagem editada\n"
-            f"Autor: {before.author} ({before.author.id})\n"
-            f"Canal: {before.channel.mention}\n"
-            f"Antes: {before.content}\n"
-            f"Depois: {after.content}"
+        embed = discord.Embed(
+            title="Mensagem editada",
+            color=discord.Color.orange(),
+            timestamp=datetime.utcnow()
         )
+        embed.add_field(name="Autor", value=f"{before.author} ({before.author.id})", inline=False)
+        embed.add_field(name="Canal", value=before.channel.mention, inline=False)
+        embed.add_field(name="Antes", value=before.content or "Vazio", inline=False)
+        embed.add_field(name="Depois", value=after.content or "Vazio", inline=False)
 
-    # ========= ALTERAÇÕES NO SERVIDOR =========
+        await channel.send(embed=embed)
+
+    # ===== ALTERAÇÃO NO SERVIDOR =====
     @commands.Cog.listener()
     async def on_guild_update(self, before, after):
-        channel = self.get_log_channel(after)
+        if before.name == after.name:
+            return
+
+        channel = self.log_channel(after)
         if not channel:
             return
 
-        if before.name != after.name:
-            await channel.send(
-                f"Nome do servidor alterado\n"
-                f"Antes: {before.name}\n"
-                f"Depois: {after.name}"
-            )
+        embed = discord.Embed(
+            title="Servidor alterado",
+            color=discord.Color.blue(),
+            timestamp=datetime.utcnow()
+        )
+        embed.add_field(name="Nome antigo", value=before.name, inline=False)
+        embed.add_field(name="Nome novo", value=after.name, inline=False)
 
-    # ========= BAN =========
+        await channel.send(embed=embed)
+
+    # ===== BAN =====
     @commands.Cog.listener()
     async def on_member_ban(self, guild, user):
-        channel = self.get_log_channel(guild)
+        channel = self.log_channel(guild)
         if not channel:
             return
 
-        await channel.send(
-            f"Usuário banido\n"
-            f"Usuário: {user} ({user.id})"
+        embed = discord.Embed(
+            title="Usuário banido",
+            color=discord.Color.dark_red(),
+            timestamp=datetime.utcnow()
         )
+        embed.add_field(name="Usuário", value=f"{user} ({user.id})", inline=False)
 
-    # ========= UNBAN =========
+        await channel.send(embed=embed)
+
+    # ===== UNBAN =====
     @commands.Cog.listener()
     async def on_member_unban(self, guild, user):
-        channel = self.get_log_channel(guild)
+        channel = self.log_channel(guild)
         if not channel:
             return
 
-        await channel.send(
-            f"Usuário desbanido\n"
-            f"Usuário: {user} ({user.id})"
+        embed = discord.Embed(
+            title="Usuário desbanido",
+            color=discord.Color.green(),
+            timestamp=datetime.utcnow()
         )
+        embed.add_field(name="Usuário", value=f"{user} ({user.id})", inline=False)
 
-    # ========= KICK =========
+        await channel.send(embed=embed)
+
+    # ===== KICK =====
     @commands.Cog.listener()
     async def on_member_remove(self, member):
-        # Não dá pra diferenciar saída normal de kick 100% sem audit log
-        channel = self.get_log_channel(member.guild)
+        channel = self.log_channel(member.guild)
         if not channel:
             return
 
         async for entry in member.guild.audit_logs(limit=1):
             if entry.target.id == member.id and entry.action == discord.AuditLogAction.kick:
-                await channel.send(
-                    f"Usuário kickado\n"
-                    f"Usuário: {member} ({member.id})\n"
-                    f"Por: {entry.user}"
+                embed = discord.Embed(
+                    title="Usuário kickado",
+                    color=discord.Color.dark_orange(),
+                    timestamp=datetime.utcnow()
                 )
+                embed.add_field(name="Usuário", value=f"{member} ({member.id})", inline=False)
+                embed.add_field(name="Por", value=entry.user, inline=False)
+
+                await channel.send(embed=embed)
                 return
 
-    # ========= CASTIGO / TIMEOUT =========
+    # ===== CASTIGO / TIMEOUT =====
     @commands.Cog.listener()
     async def on_member_update(self, before, after):
-        channel = self.get_log_channel(after.guild)
+        channel = self.log_channel(after.guild)
         if not channel:
             return
 
-        # Timeout aplicado
         if before.communication_disabled_until != after.communication_disabled_until:
             if after.communication_disabled_until:
                 restante = after.communication_disabled_until - datetime.utcnow()
                 minutos = int(restante.total_seconds() // 60)
 
-                await channel.send(
-                    f"Usuário castigado (timeout)\n"
-                    f"Usuário: {after} ({after.id})\n"
-                    f"Tempo restante: {minutos} minutos"
+                embed = discord.Embed(
+                    title="Usuário castigado",
+                    color=discord.Color.purple(),
+                    timestamp=datetime.utcnow()
                 )
+                embed.add_field(name="Usuário", value=f"{after} ({after.id})", inline=False)
+                embed.add_field(name="Tempo restante", value=f"{minutos} minutos", inline=False)
             else:
-                await channel.send(
-                    f"Castigo removido\n"
-                    f"Usuário: {after} ({after.id})"
+                embed = discord.Embed(
+                    title="Castigo removido",
+                    color=discord.Color.green(),
+                    timestamp=datetime.utcnow()
                 )
+                embed.add_field(name="Usuário", value=f"{after} ({after.id})", inline=False)
 
-    # ========= MEMBRO ENTROU (ALT CHECK) =========
+            await channel.send(embed=embed)
+
+    # ===== ENTRADA + ALT CHECK =====
     @commands.Cog.listener()
     async def on_member_join(self, member):
-        channel = self.get_log_channel(member.guild)
+        channel = self.log_channel(member.guild)
         if not channel:
             return
 
-        conta_idade = datetime.utcnow() - member.created_at
-        dias = conta_idade.days
+        idade = (datetime.utcnow() - member.created_at).days
+        status = "Possível ALT" if idade < self.ALT_DAYS_LIMIT else "Conta normal"
 
-        alt_status = "POSSÍVEL ALT." if dias < self.ALT_DAYS_LIMIT else "Conta normal."
-
-        await channel.send(
-            f"Membro entrou no servidor\n"
-            f"Usuário: {member} ({member.id})\n"
-            f"Criou a conta em: {member.created_at.strftime('%d/%m/%Y')}\n"
-            f"Idade da conta: {dias} dias\n"
-            f"Status: **{alt_status}**"
+        embed = discord.Embed(
+            title="Membro entrou",
+            color=discord.Color.teal(),
+            timestamp=datetime.utcnow()
         )
+        embed.add_field(name="Usuário", value=f"{member} ({member.id})", inline=False)
+        embed.add_field(name="Conta criada em", value=member.created_at.strftime("%d/%m/%Y"), inline=False)
+        embed.add_field(name="Idade da conta", value=f"{idade} dias", inline=False)
+        embed.add_field(name="Status", value=status, inline=False)
+
+        await channel.send(embed=embed)
 
 async def setup(bot):
     await bot.add_cog(Logs(bot))
