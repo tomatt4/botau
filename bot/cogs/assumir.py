@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from bot.db import get_conn
+from db import get_conn
 
 class Assumir(commands.Cog):
     def __init__(self, bot):
@@ -13,7 +13,7 @@ class Assumir(commands.Cog):
     @commands.has_permissions(administrator=True)
     async def assumir(self, ctx: commands.Context):
         # verifica se é um ticket válido
-        conn = get_db_connection()
+        conn = get_conn()
         cur = conn.cursor()
 
         cur.execute(
