@@ -6,7 +6,7 @@ class Logs(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    LOG_CHANNEL_ID = 1454971586758180907  # ID do canal de logs
+    LOG_CHANNEL_ID = 1406713073720496179  # ID do canal de logs
     ALT_DAYS_LIMIT = 3
 
     def log_channel(self, guild):
