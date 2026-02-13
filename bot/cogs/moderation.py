@@ -10,56 +10,160 @@ class Moderation(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    async def cog_check(self, ctx):
+    # 🔒 Checagem global (admin)
+    async def cog_check(self, ctx: commands.Context):
         return ctx.author.guild_permissions.administrator
 
-    @commands.hybrid_command(name="ban", description="Banir um usuário com um tempo")
-    @app_commands.describe(user="Usuários", time="Duração em segundos", reason="Motivo")
+    # =====================
+    # 🔨 BAN
+    # =====================
+    @commands.hybrid_command(
+        name="ban",
+        description="Banir um usuário com tempo opcional",
+    )
+    @app_commands.describe(
+        user="Usuário",
+        time="Duração em segundos",
+        reason="Motivo",
+    )
     @commands.has_permissions(ban_members=True)
-    async def ban(self, ctx, user: discord.Member, time: int = None, *, reason: str = "Nenhum motivo fornecido."):
+    async def ban(
+        self,
+        ctx: commands.Context,
+        user: discord.Member,
+        time: int | None = None,
+        *,
+        reason: str = "Nenhum motivo fornecido.",
+    ):
         await user.ban(reason=reason)
-        
-        embed = discord.Embed(title="Usuário banido")
-        embed.add_field(name="<:members:1457446686774526094> | Usuário", value=f"{user.name} ({user.id})", inline=False)
-        embed.add_field(name="<:admin:1457446645015773426> | Admin", value=ctx.author.name, inline=False)
-        embed.add_field(name="<:FAQ:1457446924842963006> | Motivo", value=reason, inline=False)
+
+        embed = discord.Embed(
+            title="Usuário banido",
+            color=discord.Color.red(),
+        )
+        embed.add_field(
+            name="Usuário",
+            value=f"{user} ({user.id})",
+            inline=False,
+        )
+        embed.add_field(
+            name="Admin",
+            value=f"{ctx.author} ({ctx.author.id})",
+            inline=False,
+        )
+        embed.add_field(
+            name="Motivo",
+            value=reason,
+            inline=False,
+        )
+
         if time:
-            embed.add_field(name="Duração", value=f"{time} segundos", inline=False)
-        
+            embed.add_field(
+                name="Duração",
+                value=f"{time} segundos",
+                inline=False,
+            )
+
         await ctx.send(embed=embed)
 
+        # ⏰ Desban automático
         if time:
             await asyncio.sleep(time)
             await ctx.guild.unban(user)
-            await ctx.send(f"{user.name} foi desbanido depois de {time} segundos.")
+            await ctx.send(
+                f"**{user.name}** foi desbanido após **{time} segundos**."
+            )
 
-    @commands.hybrid_command(name="kick", description="Expulse um usuário")
-    @app_commands.describe(user="Usuário", reason="Motivo")
+    # =====================
+    # 👢 KICK
+    # =====================
+    @commands.hybrid_command(
+        name="kick",
+        description="Expulsar um usuário",
+    )
+    @app_commands.describe(
+        user="Usuário",
+        reason="Motivo",
+    )
     @commands.has_permissions(kick_members=True)
-    async def kick(self, ctx, user: discord.Member, *, reason: str = "Nenhum motivo fornecido."):
+    async def kick(
+        self,
+        ctx: commands.Context,
+        user: discord.Member,
+        *,
+        reason: str = "Nenhum motivo fornecido.",
+    ):
         await user.kick(reason=reason)
-        await ctx.send(f"Expulsado {user.name}. Motivo: {reason}")
+        await ctx.send(
+            f"**{user.name}** foi expulso.\n📄 Motivo: {reason}"
+        )
 
-    @commands.hybrid_command(name="mute", description="Silenciar um usuário")
-    @app_commands.describe(user="Usuário", time="Duração em minutos", reason="Motivo")
+    # =====================
+    # 🔇 MUTE / TIMEOUT
+    # =====================
+    @commands.hybrid_command(
+        name="mute",
+        description="Silenciar um usuário",
+    )
+    @app_commands.describe(
+        user="Usuário",
+        time="Duração em minutos",
+        reason="Motivo",
+    )
     @commands.has_permissions(moderate_members=True)
-    async def silenciar(self, ctx, user: discord.Member, time: int, *, reason: str = "Nenhnum motivo fornecido."):
+    async def mute(
+        self,
+        ctx: commands.Context,
+        user: discord.Member,
+        time: int,
+        *,
+        reason: str = "Nenhum motivo fornecido.",
+    ):
         duration = timedelta(minutes=time)
         await user.timeout(duration, reason=reason)
-        await ctx.send(f"{user.name} foi silenciado por {time} minutos. Motivo: {reason}")
 
-    @commands.hybrid_command(name="warn", description="Avisar um usuário")
-    @app_commands.describe(user="Usuário", reason="Motivo")
+        await ctx.send(
+            f"**{user.name}** foi silenciado por **{time} minutos**!\n"
+            f"📄 Motivo: {reason}."
+        )
+
+    # =====================
+    # ⚠️ WARN
+    # =====================
+    @commands.hybrid_command(
+        name="warn",
+        description="Avisar um usuário",
+    )
+    @app_commands.describe(
+        user="Usuário",
+        reason="Motivo",
+    )
     @commands.has_permissions(manage_messages=True)
-    async def warn(self, ctx, user: discord.Member, *, reason: str = "Nenhum motivo fornecido."):
-        conn = get_db_connection()
-        cur = conn.cursor()
-        cur.execute("INSERT INTO warns (user_id, moderator_id, reason) VALUES (%s, %s, %s)", 
-                    (str(user.id), str(ctx.author.id), reason))
-        conn.commit()
-        cur.close()
-        conn.close()
-        await ctx.send(f"Membro avisado: {user.name}. Motivo: {reason}")
+    async def warn(
+        self,
+        ctx: commands.Context,
+        user: discord.Member,
+        *,
+        reason: str = "Nenhum motivo fornecido.",
+    ):
+        try:
+            conn = get_conn()
+            cur = conn.cursor()
+
+            cur.execute(
+                "INSERT INTO warns (user_id, moderator_id, reason) VALUES (%s, %s, %s)",
+                (str(user.id), str(ctx.author.id), reason),
+            )
+            conn.commit()
+
+        finally:
+            cur.close()
+            conn.close()
+
+        await ctx.send(
+            f"**{user.name}** recebeu um warn\n📄 Motivo: {reason}"
+        )
+
 
 async def setup(bot):
     await bot.add_cog(Moderation(bot))
