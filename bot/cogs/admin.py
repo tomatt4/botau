@@ -7,32 +7,26 @@ class TicketView(discord.ui.View):
         super().__init__(timeout=None)
 
     @discord.ui.select(
-        placeholder="Selecione uma opção de atendimento...",
+        placeholder="Selecione uma opção de atendimento.",
         custom_id="ticket_select",
         options=[
             discord.SelectOption(
                 label="Denunciar",
                 description="Reportar algo para a staff",
                 value="denúncia",
-                emoji="<:Warning:1457445578593009734>"
+                emoji=""
             ),
             discord.SelectOption(
                 label="Sugestão",
                 description="Enviar uma ideia ou sugestão",
                 value="sugestão",
-                emoji="<:ams_idea_icon:1459017031113244773>"
-            ),
-            discord.SelectOption(
-                label="Comprar Cargo/Ícone",
-                description="Solicitar compra de cargo/Ícone(INDISPONÍVEL DEVIDO A FALTA DE BOOST!)",
-                value="comprar cargo/icone",
-                emoji="<:shopping_cart:1459016969201385592>"
+                emoji=""
             ),
             discord.SelectOption(
                 label="Suporte",
                 description="Precisa de ajuda?",
                 value="suporte",
-                emoji="<:support_icon:1459016957893284057>"
+                emoji=""
             ),
         ]
     )
@@ -44,7 +38,7 @@ class TicketView(discord.ui.View):
     async def create_ticket(self, interaction: discord.Interaction, ticket_type: str):
         guild = interaction.guild
         if not guild:
-            await interaction.response.send_message("<:warning:1457445890360086601> | Este comando só pode ser usado em um servidor.", ephemeral=True)
+            await interaction.response.send_message("Este comando só pode ser usado em um servidor.", ephemeral=True)
             return
 
         category = discord.utils.get(guild.categories, name="𝐒𝐮𝐩𝐨𝐫𝐭𝐞")
@@ -76,12 +70,12 @@ class TicketView(discord.ui.View):
 
         exclusive_role_mention = "<@&1447395230646140999>"
         
-        await interaction.response.send_message(f"<a:verificado:1457792350108647435> | Ticket criado brother: {channel.mention}", ephemeral=True)
+        await interaction.response.send_message(f"Ticket criado brother: {channel.mention}", ephemeral=True)
         await channel.send(
             f"{interaction.user.mention} {exclusive_role_mention}\n\n"
-            f"<:support:1457445690975195381> | ***Boas vindas ao seu Ticket!***\n"
+            f"***Boas vindas ao seu Ticket!***\n"
             f"Este canal é o seu ticket, e é aqui que você receberá o seu atendimento. Lembrando: apenas **adminstradores** podem visualizar esse canal.\n\n"
-            f"<:pin_pin:1457474458888573081> | ***Tipo do ticket:*** **{ticket_type}**\n"
+            f"***Tipo do ticket:*** **{ticket_type}**\n"
             f"Um administrador irá te atender em breve."
         )
 
@@ -94,11 +88,11 @@ class Admin(commands.Cog):
     async def painel(self, ctx: commands.Context):
 
         embed = discord.Embed(
-            title="<:support:1457445690975195381> | Suporte Spider Hub",
+            title="Sistema de Suporte SPHB",
             description="Boas vindas ao Sistema de Suporte Profissional da Spider Hub via **tickets**!\n\nPara saber mais sobre a função dos tickets, selecione abaixo no **Select Menu** o tipo de ajuda que você quer.",
             color=0xFFFFFF
         )
-        embed.set_footer(text="NÃO abuse do sistema de tickets. | Feito por Salva")
+        embed.set_footer(text="Sistema de Suporte SPHB feito por Salvador")
         
         view = TicketView()
 
@@ -127,11 +121,11 @@ class Admin(commands.Cog):
         if not result:
             if ctx.interaction:
                 await ctx.interaction.response.send_message(
-                    "<:Warning:1457445578593009734> | Este canal não é um ticket registrado.",
+                    "Este canal não é um ticket registrado.",
                     ephemeral=True
                 )
             else:
-                await ctx.send("<:Warning:1457445578593009734> | Este canal não é um ticket registrado.")
+                await ctx.send("Este canal não é um ticket registrado.")
             cur.close()
             conn.close()
             return
@@ -141,7 +135,7 @@ class Admin(commands.Cog):
         cur.close()
         conn.close()
 
-        mensagem = "<:Warning:1457445578593009734> | Ticket será fechado em 10 segundos!"
+        mensagem = "Ticket será fechado em 10 segundos!"
 
         if ctx.interaction:
             await ctx.interaction.response.send_message(mensagem)
@@ -152,39 +146,6 @@ class Admin(commands.Cog):
             discord.utils.utcnow() + timedelta(seconds=10)
         )
         await ctx.channel.delete(reason=f"Ticket fechado por {ctx.author.name}")
-
-    @commands.hybrid_command(name="2025", description="Atribui cargo aos membros que entraram em 2025")
-    @commands.has_permissions(administrator=True)
-    async def command_2025(self, ctx: commands.Context):
-        target_guild_id = 1406662169189421207
-        target_role_id = 1459982647802466435
-        
-        if ctx.guild.id != target_guild_id:
-            await ctx.send("❌ | Este comando só funciona no servidor específico.", ephemeral=True)
-            return
-
-        role = ctx.guild.get_role(target_role_id)
-        if not role:
-            await ctx.send("❌ | Cargo não encontrado.", ephemeral=True)
-            return
-
-        await ctx.defer()
-        
-        count = 0
-        for member in ctx.guild.members:
-            if member.bot:
-                continue
-            
-            if member.joined_at and member.joined_at.year == 2025:
-                if role not in member.roles:
-                    try:
-                        await member.add_roles(role)
-                        count += 1
-                    except:
-                        continue
-        
-        await ctx.send(f"✅ | Operação concluída! {count} membros que entraram em 2025 receberam o cargo.")
-
 
 async def setup(bot):
     await bot.add_cog(Admin(bot))
