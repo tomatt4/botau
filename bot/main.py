@@ -16,7 +16,7 @@ class RizeBot(commands.Bot):
     def __init__(self):
         intents = discord.Intents.all()
         super().__init__(
-            command_prefix=".",
+            command_prefix=",",
             intents=intents,
             help_command=None,
             activity=discord.Game(name="resenha confirmada")
