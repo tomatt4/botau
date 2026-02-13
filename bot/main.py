@@ -4,7 +4,7 @@ import sys
 import asyncio
 from discord.ext import commands
 from dotenv import load_dotenv
-
+from keepalive import keep_alive
 # Add the project root to sys.path to allow imports from 'bot' package
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -43,5 +43,6 @@ class RizeBot(commands.Bot):
         print(f"Conectado: {self.user} (ID: {self.user.id})")
         print("------")
 
+keep_alive()
 bot = RizeBot()
 bot.run("MTQ1NzQxMjQ0NDg0NTY0MTgxMQ.GqnwYM.4r1-vVfwgHcwSYygn5GmrYMVh9j9YbA-9vH7fM")
