@@ -88,7 +88,7 @@ class TicketView(discord.ui.View):
             cur.close()
             conn.close()
 
-        exclusive_role_mention = ""
+        exclusive_role_mention = "<@&1447395230646140999>"
 
         await interaction.response.send_message(
             f"Ticket criado brother: {channel.mention}",
