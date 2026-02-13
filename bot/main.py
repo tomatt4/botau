@@ -1,14 +1,16 @@
 import discord
 import os
 import sys
-import asyncio
 from discord.ext import commands
 from dotenv import load_dotenv
 from keepalive import keep_alive
-# Add the project root to sys.path to allow imports from 'bot' package
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+# 👇 IMPORT DO BANCO
+from bot.db import init_db
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 load_dotenv()
+
 
 class RizeBot(commands.Bot):
     def __init__(self):
@@ -21,7 +23,7 @@ class RizeBot(commands.Bot):
         )
 
     async def setup_hook(self):
-        # Load extensions/cogs
+        # 📦 Carregar cogs
         await self.load_extension("cogs.moderation")
         await self.load_extension("cogs.admin")
         await self.load_extension("cogs.random_number")
@@ -34,14 +36,24 @@ class RizeBot(commands.Bot):
         await self.load_extension("cogs.mensagem")
         await self.load_extension("cogs.embeds")
         await self.load_extension("cogs.word_filter")
+
         print("Lumi: Cogs carregados")
-        # Sync slash commands
+
+        # 🔁 Sync dos slash
         await self.tree.sync()
         print("Lumi: Comandos sincronizados brother")
 
+        # 🎫 View persistente do painel (IMPORTANTE)
+        from cogs.admin import TicketView
+        self.add_view(TicketView())
+
     async def on_ready(self):
+        # 🧱 CRIA AS TABELAS AUTOMATICAMENTE
+        init_db()
+
         print(f"Conectado: {self.user} (ID: {self.user.id})")
         print("------")
+
 
 keep_alive()
 bot = RizeBot()
