@@ -57,7 +57,7 @@ class TicketView(discord.ui.View):
         channel = await guild.create_text_channel(channel_name, category=category, overwrites=overwrites)
         
         # Save ticket to DB
-        conn = get_db_connection()
+        conn = get_conn()
         cur = conn.cursor()
         cur.execute("INSERT INTO tickets (user_id, channel_id, type) VALUES (%s, %s, %s)",
                     (str(interaction.user.id), str(channel.id), ticket_type))
@@ -109,7 +109,7 @@ class Admin(commands.Cog):
     @commands.hybrid_command(name="fechar", description="Fechar o ticket atual")
     @commands.has_permissions(administrator=True)
     async def fechar(self, ctx: commands.Context):
-        conn = get_db_connection()
+        conn = get_conn()
         cur = conn.cursor()
 
         cur.execute("SELECT id FROM tickets WHERE channel_id = %s", (str(ctx.channel.id),))
