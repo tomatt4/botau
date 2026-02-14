@@ -13,7 +13,7 @@ class Welcome(commands.Cog):
         if not channel:
             return
 
-        await channel.send(f"{member.mention} entrou no servidor! Recepção notificada automaticamente.\n\n-# ||<@&1420778000504324238>||")
+        await channel.send(f"{member.mention} entrou no servidor!\n\n -# <@&1420778000504324238>")
 
 async def setup(bot):
     await bot.add_cog(Welcome(bot))
