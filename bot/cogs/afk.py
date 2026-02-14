@@ -12,43 +12,40 @@ class AFK(commands.Cog):
         await ctx.send(f"Seu afk foi setado como ***{motivo}***. Até mais!")
 
     @commands.Cog.listener()
-async def on_message(self, message: discord.Message):
-    if message.author.bot:
-        return
+    async def on_message(self, message: discord.Message):
+        if message.author.bot:
+            return
 
-    # Remove AFK ao falar
-    if message.author.id in self.afk_users:
-        del self.afk_users[message.author.id]
+        # 🔹 Se o autor estava AFK, remove silenciosamente
+        if message.author.id in self.afk_users:
+            del self.afk_users[message.author.id]
 
-    if message.mention_everyone:
-        return
+        # 🔹 Se mencionar alguém AFK (Diretamente ou via Resposta)
+        # Ignora menções de everyone, here ou cargos
+        if message.mention_everyone:
+            return
 
-    afk_detected = set()
+        afk_detected = set()
 
-    # Menções diretas
-    for user in message.mentions:
-        if user.id in self.afk_users:
-            afk_detected.add(user)
+        # 1. Menções diretas no conteúdo da mensagem (excluindo cargos)
+        for user in message.mentions:
+            if user.id in self.afk_users:
+                afk_detected.add(user)
 
-    # Reply
-    if message.reference:
-        try:
-            replied_msg = await message.channel.fetch_message(
-                message.reference.message_id
+        # 2. Usuário que está sendo respondido (Reply)
+        if message.reference and message.reference.resolved:
+            replied_msg = message.reference.resolved
+            if isinstance(replied_msg, discord.Message):
+                replied_user = replied_msg.author
+                if replied_user.id in self.afk_users:
+                    afk_detected.add(replied_user)
+
+        # Avisa para os usuários detectados
+        for user in afk_detected:
+            motivo = self.afk_users[user.id]
+            await message.channel.send(
+                f"{user.display_name} está AFK! Motivo: **{motivo}**"
             )
-            if replied_msg.author.id in self.afk_users:
-                afk_detected.add(replied_msg.author)
-        except discord.NotFound:
-            pass
-
-    for user in afk_detected:
-        motivo = self.afk_users[user.id]
-        await message.channel.send(
-            f"**{user.display_name}** está afk! Motivo: **{motivo}**"
-        )
-
-    # MUITO IMPORTANTE
-    await self.bot.process_commands(message)
 
 async def setup(bot):
  await bot.add_cog(AFK(bot))
