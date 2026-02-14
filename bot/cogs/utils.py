@@ -11,11 +11,11 @@ class Utils(commands.Cog):
     @commands.has_permissions(manage_messages=True)
     async def limpar(self, ctx: commands.Context, quantidade: int):
         if quantidade > 3000:
-            await ctx.send("<:warning:1457445890360086601> **ERRO** | O máximo é **3000** mensagens.")
+            await ctx.send("O máximo é **3000** mensagens.")
             return
 
         await ctx.channel.purge(limit=quantidade + 1)
-        msg = await ctx.send(f"<a:verificado:1457792350108647435> | **{quantidade}** mensagens apagadas.")
+        msg = await ctx.send(f"**{quantidade}** mensagens apagadas.")
         await msg.delete(delay=5)
 
     # /ping
@@ -27,7 +27,7 @@ async def ping(self, ctx):  # removeu a anotação
     else:
         latencia = round(self.bot.latency * 1000)
     
-    await ctx.send(f"Pong! Meu tempo de resposta é de `{latencia} milisegundos`")
+    await ctx.send(f"Pong! Meu tempo de resposta é de `{latencia} milisegundos`!")
 
     # /avatar
     @commands.hybrid_command(name="avatar", description="Mostra o avatar de um usuário")
@@ -110,9 +110,9 @@ async def ping(self, ctx):  # removeu a anotação
                 "- /serverinfo \n"
                 "- /numero\n"
             ),
-            color=0x000000
+            color=0xFFFFFF
         )
-        embed.set_footer(text="Cada comando, cada sistema no bot tem a assinatura do Salva. Fazer um bot desses NÃO é fácil!")
+        embed.set_footer(text="Cada comando, cada sistema no bot tem a assinatura do Salvador. Fazer um bot desses NÃO é fácil!")
         await ctx.send(embed=embed)
 
 async def setup(bot):
