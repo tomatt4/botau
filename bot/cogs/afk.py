@@ -9,7 +9,7 @@ class AFK(commands.Cog):
     @commands.hybrid_command(name="afk", description="Ficar AFK")
     async def afk(self, ctx: commands.Context, *, motivo: str = "AFK"):
         self.afk_users[ctx.author.id] = motivo
-        await ctx.send(f"🌙 {ctx.author.mention} agora está AFK: **{motivo}**")
+        await ctx.send(f"Seu afk foi setado como ***{motivo}***. Até mais!")
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
@@ -44,7 +44,7 @@ class AFK(commands.Cog):
         for user in afk_detected:
             motivo = self.afk_users[user.id]
             await message.channel.send(
-                f"{user.display_name} está AFK. **{motivo}**"
+                f"{user.display_name} está AFK! Motivo: **{motivo}**"
             )
 async def setup(bot):
  await bot.add_cog(AFK(bot))
