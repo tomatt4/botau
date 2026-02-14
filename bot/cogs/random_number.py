@@ -11,7 +11,7 @@ class RandomNumber(commands.Cog):
     )
     async def numero(self, ctx: commands.Context):
         numero = random.randint(1, 100)
-        await ctx.send(f"<a:verificado:1457792350108647435> | *Número aleatório entre 1 e 100 escolhido: **{numero}***.")
+        await ctx.send(f"Eu escolho... **{numero}**! Caso queira outro número é só rodar esse comando novamente.")
 
 async def setup(bot):
     await bot.add_cog(RandomNumber(bot))
