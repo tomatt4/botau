@@ -10,7 +10,31 @@ class Embeds(commands.Cog):
         embed = discord.Embed(
             title="",
             description=(
-                ""
+                "**ⵈ﹒ʀᴇsᴘᴇɪᴛᴏ⊹◄꯭** ``¡﹒﹒ⵗ``\n"
+                "Trate todos com educação, sem ofensas, brigas ou preconceito! :3\n\n"
+
+                "**⏝ᩙ ＞꯭sᴇᴍ ғʟᴏᴏᴅ / sᴘᴀᴍ ꩅ﹕❄**\n"
+                "Não envie mensagens repetidas, links ou divulgações sem permissão...\n\n"
+
+                "**¡ᩚᴅɪsᴄᴜssᴏ̃ᴇs ᴅᴇsɴᴇᴄᴇssᴀ́ʀɪᴀs︐＼ׂ Ꮼ ⢷𓈓🍇ᱬ︩︪͑**\n"
+                "Evite discussões, provocações ou conflitos no chat, resolva no pv.\n\n"
+
+                "**𐃆͡ ᩡ ᴄᴏɴᴛᴇᴜ́ᴅᴏ +𝟏𝟖﹍﹒ⵗ𖥔ׂ𓂂**\n"
+                "Proibido nsfw, gore ou qualquer conteúdo impróprio!\n\n"
+
+                "**ⵗⵗ◌﹐﹒ʀᴇsᴘᴇɪᴛᴇ ᴏs ᴀᴅᴍs 𐙚 💬＼ׂ**\n"
+                "Siga as orientações da staff e evite discussões desnecessárias.\n\n"
+
+                "**︵꯭︵＼🌷ᩧ𓈓ᱬ︩︪͑𝄒 ᴄʟɪᴍᴀ ᴀᴍɪɢᴀ́ᴠᴇʟ**\n"
+                "Mantenha a house leve, divertida e confortável pra todo mundo!\n\n"
+
+                "**ᩡ♡⃘﹒💢﹒ ᴘᴜɴɪᴄ̧ᴏ̃ᴇs 𓎟**\n"
+                "O descumprimento das regras pode resultar em aviso, mute ou ban...\n\n"
+
+                "**ᩡ♡⃘🍡﹍︒ ✿ᩧ  ᴍᴇɴsᴀɢᴇᴍ  ғɪɴᴀʟ  ⵗⵗ◌﹐﹒❥⃘**\n"
+                "Esperamos que todos se sintam confortáveis, seguros e bem-vindos aqui ✿\n"
+                "Respeite as regras, cuide dos outros membros e mantenha o clima leve e amigável.\n"
+                "Assim todo mundo consegue se divertir, fazer amizades e aproveitar a house juntinhos (≧▽≦) 🌸"
             
             ),
 
@@ -18,6 +42,7 @@ class Embeds(commands.Cog):
         )
         await ctx.send(embed=embed)
         embed.set_footer(text="")
+        embed.set_image(url="https://cdn.discordapp.com/attachments/1465034087147507817/1472020392645496955/d69820617738868f7b39dd1b09e1b19b.jpg?ex=69910d52&is=698fbbd2&hm=e84af445bffe8177fba6500c481dcebfc84c647fc847c3680dd6bf25547cbf43&")
         
 
 async def setup(bot):
