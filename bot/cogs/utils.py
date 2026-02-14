@@ -20,7 +20,7 @@ class Utils(commands.Cog):
 
     # /ping
 @commands.hybrid_command(name="ping", description="Mostra a latência do bot")
-async def ping(self, ctx: commands.Context):
+async def ping(self, ctx):  # removeu a anotação
     # 1 em 10.000 chances (0,01%)
     if random.randint(1, 10000) == 1:
         latencia = -1
