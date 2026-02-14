@@ -16,18 +16,13 @@ class Utils(commands.Cog):
 
         await ctx.channel.purge(limit=quantidade + 1)
         msg = await ctx.send(f"**{quantidade}** mensagens apagadas.")
-        await msg.delete(delay=5)
+        await msg.delete(delay=3)
 
     # /ping
-@commands.hybrid_command(name="ping", description="Mostra a latência do bot")
-async def ping(self, ctx):  # removeu a anotação
-    # 1 em 10.000 chances (0,01%)
-    if random.randint(1, 10000) == 1:
-        latencia = -1
-    else:
+   @commands.hybrid_command(name="ping", description="Mostra a latência do bot")
+    async def ping(self, ctx: commands.Context):
         latencia = round(self.bot.latency * 1000)
-    
-    await ctx.send(f"Pong! Meu tempo de resposta é de `{latencia} milisegundos`!")
+        await ctx.send(f"Meu tempo de resposta é de {latencia} milisegundos.")
 
     # /avatar
     @commands.hybrid_command(name="avatar", description="Mostra o avatar de um usuário")
