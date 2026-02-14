@@ -9,24 +9,24 @@ class Status(commands.Cog):
 
     def qualidade_conexao(self, ping: int) -> str:
         if ping < 10:
-            return "🟢 Perfeita"
+            return "Perfeita"
         elif ping < 100:
-            return "🟢 Estável"
+            return "Estável"
         elif ping < 200:
-            return "🟡 Média"
+            return "Média"
         elif ping < 500:
-            return "🟠 Ruim"
+            return "Ruim"
         elif ping < 700:
-            return "🔴 Horrível"
+            return "Horrível"
         else:
-            return "💀 Inutilizável"
+            return "Lamentável esse ping."
 
     @app_commands.command(name="status", description="Mostra o status geral do bot")
     async def status(self, interaction: discord.Interaction):
         ping = round(self.bot.latency * 1000)
 
-        websocket_status = "🟢 Conectado" if self.bot.is_ready() else "🔴 Desconectado"
-        gateway_status = "🟢 OK" if ping < 300 else "🔴 Ruim"
+        websocket_status = "Conectado" if self.bot.is_ready() else "Desconectado"
+        gateway_status = "OK" if ping < 300 else "Ruim"
         qualidade = self.qualidade_conexao(ping)
 
         shard_info = (
@@ -36,19 +36,19 @@ class Status(commands.Cog):
         )
 
         embed = discord.Embed(
-            title="📡tatus do Sistema",
+            title="Status do Sistema:",
             color=discord.Color.green()
         )
 
         embed.add_field(
-            name="Hospedagem 24/7",
-            value="Render + UptimeRobot",
+            name="Hospedado em",
+            value="Servidor Interno do Render + UptimeRobot",
             inline=False
 
         )
         embed.add_field(
-            name="Servidor Interno",
-            value=shard_info,
+            name="URL de Uptime",
+            value="https://botau.onrender.com",
             inline=True
         )
         embed.add_field(
