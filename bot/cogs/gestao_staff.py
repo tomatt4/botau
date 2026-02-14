@@ -28,7 +28,7 @@ class GestaoStaff(commands.Cog):
                 await membro.add_roles(cargo)
 
         await interaction.response.send_message(
-            f"✅ {membro.mention} foi recrutado para a staff.",
+            f"{membro.mention} foi recrutado para a staff.",
             
         )
 
@@ -48,7 +48,7 @@ class GestaoStaff(commands.Cog):
 
         if not cargos:
             await interaction.response.send_message(
-                "❌ O usuário não possui cargos para subir.",
+                "O usuário não possui cargos para subir.",
                 ephemeral=True
             )
             return
@@ -63,7 +63,7 @@ class GestaoStaff(commands.Cog):
 
         if not cargos_acima:
             await interaction.response.send_message(
-                "❌ Esse usuário já está no cargo mais alto.",
+                "Esse usuário já está no cargo mais alto.",
                 ephemeral=True
             )
             return
@@ -74,7 +74,7 @@ class GestaoStaff(commands.Cog):
         await membro.add_roles(proximo_cargo)
 
         await interaction.response.send_message(
-            f"⬆️ {membro.mention} foi promovido de **{cargo_atual.name}** para **{proximo_cargo.name}**.",
+            f"{membro.mention} foi promovido de **{cargo_atual.name}** para **{proximo_cargo.name}**.",
             
         )
 
@@ -94,7 +94,7 @@ class GestaoStaff(commands.Cog):
 
         if not cargos:
             await interaction.response.send_message(
-                "❌ O usuário não possui cargos para descer.",
+                "O usuário não possui cargos para descer.",
                 ephemeral=True
             )
             return
@@ -109,7 +109,7 @@ class GestaoStaff(commands.Cog):
 
         if not cargos_abaixo:
             await interaction.response.send_message(
-                "❌ Esse usuário já está no cargo mais baixo.",
+                "Esse usuário já está no cargo mais baixo.",
                 ephemeral=True
             )
             return
@@ -120,7 +120,7 @@ class GestaoStaff(commands.Cog):
         await membro.add_roles(cargo_inferior)
 
         await interaction.response.send_message(
-            f"⬇️ {membro.mention} foi rebaixado de **{cargo_atual.name}** para **{cargo_inferior.name}**.",
+            f"{membro.mention} foi rebaixado de **{cargo_atual.name}** para **{cargo_inferior.name}**.",
 
 
             )
