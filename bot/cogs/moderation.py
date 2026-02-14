@@ -38,7 +38,7 @@ class Moderation(commands.Cog):
         await user.ban(reason=reason)
 
         embed = discord.Embed(
-            title="Usuário banido",
+            title="Usuário Banido",
             color=discord.Color.red(),
         )
         embed.add_field(
