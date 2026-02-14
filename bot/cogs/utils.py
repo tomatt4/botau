@@ -17,9 +17,9 @@ class Utils(commands.Cog):
         await ctx.channel.purge(limit=quantidade + 1)
         msg = await ctx.send(f"**{quantidade}** mensagens apagadas.")
         await msg.delete(delay=3)
-
-    # /ping
-   @commands.hybrid_command(name="ping", description="Mostra a latência do bot")
+        
+      # /ping
+    @commands.hybrid_command(name="ping", description="Mostra a latência do bot")
     async def ping(self, ctx: commands.Context):
         latencia = round(self.bot.latency * 1000)
         await ctx.send(f"Meu tempo de resposta é de {latencia} milisegundos.")
