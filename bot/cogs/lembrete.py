@@ -28,17 +28,17 @@ class Lembrete(commands.Cog):
         segundos = parse_time(tempo)
 
         if not segundos:
-            await ctx.send("❌ Tempo inválido.")
+            await ctx.send("Tempo inválido.")
             return
 
         if segundos > TIME_LIMIT:
-            await ctx.send("❌ O tempo máximo é 5 meses.")
+            await ctx.send("O tempo máximo é 5 meses.")
             return
 
-        await ctx.send(f"⏰ Lembrete **{nome}** criado!")
+        await ctx.send(f"Lembrete **{nome}** criado!")
 
         await asyncio.sleep(segundos)
-        await ctx.send(f"🔔 **Lembrete:** {nome}")
+        await ctx.send(f"**Lembrete:** {nome}!!")
 
 async def setup(bot):
     await bot.add_cog(Lembrete(bot))
