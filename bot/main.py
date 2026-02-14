@@ -37,7 +37,6 @@ class RizeBot(commands.Bot):
         await self.load_extension("cogs.embeds")
         await self.load_extension("cogs.word_filter")
         await self.load_extension("cogs.welcome")
-        await self.load_extension("cogs.logs")
 
         print("Lumi: Cogs carregados")
 
