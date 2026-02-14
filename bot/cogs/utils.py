@@ -23,10 +23,10 @@ class Utils(commands.Cog):
     async def ping(self, ctx: commands.Context):
     # 1 em 10.000 chances (0,01%)
         if random.randint(1, 10000) == 1:
-        latencia = -1
-        else:
-        latencia = round(self.bot.latency * 1000)
-        await ctx.send(f"Pong! Meu tempo de resposta é de `{latencia} milisegundos`")
+            latencia = -1
+            else:
+            latencia = round(self.bot.latency * 1000)
+            await ctx.send(f"Pong! Meu tempo de resposta é de `{latencia} milisegundos`")
 
     # /avatar
     @commands.hybrid_command(name="avatar", description="Mostra o avatar de um usuário")
