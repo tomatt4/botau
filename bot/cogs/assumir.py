@@ -38,9 +38,7 @@ class Assumir(commands.Cog):
         conn.close()
 
         mensagem = (
-            f"<a:verificado:1458234566597804170> | **Ticket assumido**\n"
-            f"O administrador **{ctx.author.mention}** assumiu este ticket!\n"
-            f"Boa sorte no seu atendimento."
+            f"Ticket assumido!"
         )
 
         # separação correta entre slash e prefixo
