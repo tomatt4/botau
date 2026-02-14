@@ -42,7 +42,7 @@ class Embeds(commands.Cog):
         )
         await ctx.send(embed=embed)
         embed.set_footer(text="")
-        embed.set_image(url="https://cdn.discordapp.com/attachments/1465034087147507817/1472020392645496955/d69820617738868f7b39dd1b09e1b19b.jpg")
+        embed.set_image(url="https://i.postimg.cc/qM5bJhNC/d69820617738868f7b39dd1b09e1b19b.jpg")
         
 
 async def setup(bot):
