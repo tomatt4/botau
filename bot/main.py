@@ -40,6 +40,7 @@ class RizeBot(commands.Bot):
         await self.load_extension("cogs.antiraid")
         await self.load_extension("cogs.sair")
         await self.load_extension("cogs.tomate")
+        await self.load_extension("cogs.status")
 
         print("Lumi: Cogs carregados")
 
