@@ -37,12 +37,12 @@ class Embeds(commands.Cog):
                 "Assim todo mundo consegue se divertir, fazer amizades e aproveitar a house juntinhos (≧▽≦) 🌸"
             
             ),
-
+        
             color=0xFFFFF
         )
         await ctx.send(embed=embed)
         embed.set_footer(text="")
-        embed.set_image(url="https://i.postimg.cc/qM5bJhNC/d69820617738868f7b39dd1b09e1b19b.jpg")
+        embed.set_image(url="https://i.postimg.cc/qM5bJhNC/d69820617738868f7b39dd1b09e1b19b.png")
         
 
 async def setup(bot):
