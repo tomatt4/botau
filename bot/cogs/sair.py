@@ -14,14 +14,16 @@ class Kitar(commands.Cog):
 
         frases = [
             f"{membro.mention} kitou porque foi cancelado pelo Elon Musk",
-            f"{membro.mention} kitou pra tocar grama",
-            f"{membro.mention} kitou após descobrir o ping negativo",
-            f"{membro.mention} kitou pra virar NPC do TikTok",
+            f"{membro.mention} kitou porque é um favelado subdesenvolvido(homenagem ao bleki)",
+            f"{membro.mention} kitou porque é um beta",
+            f"{membro.mention} kitou pra fazer live NPC do TikTok",
             f"{membro.mention} kitou porque confundiu Discord com WhatsApp",
-            f"{membro.mention} kitou dizendo 'já volto' (não voltou)",
-            f"{membro.mention} kitou pra buscar o leite",
+            f"{membro.mention} kitou dizendo 'já volto' (obs: não voltou)",
+            f"{membro.mention} kitou porque foi ali fumar cigarro",
             f"{membro.mention} kitou da realidade",
             f"{membro.mention} kitou porque o bot mandou",
+            f"{membro.mention} kitou porque o Cristiano Ronaldo recusou o pedido de casamento",
+            f"{membro.mention} kitou porque o Neymar traiu ele",
         ]
 
         await ctx.send(random.choice(frases))
