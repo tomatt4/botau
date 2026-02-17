@@ -1,5 +1,6 @@
 import discord
 import random
+from db import get_user_stats
 from discord.ext import commands
 
 class Utils(commands.Cog):
@@ -33,18 +34,64 @@ class Utils(commands.Cog):
         await ctx.send(embed=embed)
 
     # /userinfo
-    @commands.hybrid_command(name="userinfo", description="Mostra informações de um usuário")
-    async def userinfo(self, ctx: commands.Context, usuario: discord.Member = None):
-        usuario = usuario or ctx.author
-        roles = [role.mention for role in usuario.roles[1:]]
-        embed = discord.Embed(title=f"Informações de {usuario.name}", color=discord.Color.blue())
-        embed.set_thumbnail(url=usuario.display_avatar.url)
-        embed.add_field(name="ID", value=usuario.id, inline=True)
-        embed.add_field(name="Nickname", value=usuario.nick or "Nenhum", inline=True)
-        embed.add_field(name="Conta Criada", value=usuario.created_at.strftime("%d/%m/%Y"), inline=True)
-        embed.add_field(name="Entrou no Servidor", value=usuario.joined_at.strftime("%d/%m/%Y"), inline=True)
-        embed.add_field(name=f"Cargos ({len(roles)})", value=" ".join(roles) if roles else "Nenhum", inline=False)
-        await ctx.send(embed=embed)
+    @commands.hybrid_command(
+    name="userinfo",
+    description="Mostra informações de um usuário"
+)
+async def userinfo(self, ctx: commands.Context, usuario: discord.Member = None):
+    usuario = usuario or ctx.author
+
+    roles = [role.mention for role in usuario.roles[1:]]
+
+    # 🔍 Busca stats na DB
+    stats = get_user_stats(usuario.id)
+
+    if stats:
+        role_name = f"/{stats['role_name']}"
+        messages = stats["total_messages"]
+        seconds = stats["total_seconds"]
+
+        hours = seconds // 3600
+        minutes = (seconds % 3600) // 60
+
+        tempo = f"{hours}h {minutes}min"
+    else:
+        role_name = "Nenhum"
+        messages = 0
+        tempo = "0h 0min"
+
+    embed = discord.Embed(
+        title=f"Informações de {usuario.name}",
+        color=discord.Color.blue()
+    )
+
+    embed.set_thumbnail(url=usuario.display_avatar.url)
+
+    embed.add_field(name="ID", value=usuario.id, inline=True)
+    embed.add_field(name="Nickname", value=usuario.nick or "Nenhum", inline=True)
+    embed.add_field(
+        name="Conta Criada",
+        value=usuario.created_at.strftime("%d/%m/%Y"),
+        inline=True
+    )
+    embed.add_field(
+        name="Entrou no Servidor",
+        value=usuario.joined_at.strftime("%d/%m/%Y"),
+        inline=True
+    )
+
+    embed.add_field(
+        name=f"Cargos ({len(roles)})",
+        value=" ".join(roles) if roles else "Nenhum",
+        inline=False
+    )
+
+    # ⭐ PARTE NOVA (stats)
+    embed.add_field(name="Cargo monitorado", value=role_name, inline=True)
+    embed.add_field(name="Mensagens", value=str(messages), inline=True)
+    embed.add_field(name="Tempo ativo", value=tempo, inline=True)
+
+    await ctx.send(embed=embed)
 
     # /serverinfo
     @commands.hybrid_command(name="serverinfo", description="Mostra informações do servidor")
