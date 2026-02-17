@@ -18,7 +18,7 @@ class CargoModal(discord.ui.Modal, title="Criar Cargo Personalizado"):
 
     nome = discord.ui.TextInput(
         label="Nome do cargo",
-        placeholder="Ex: Elite, Campeão, Lendário",
+        placeholder="Ex: aura, ego, king...",
         max_length=50
     )
 
