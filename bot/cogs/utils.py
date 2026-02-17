@@ -38,7 +38,7 @@ class Utils(commands.Cog):
     name="userinfo",
     description="Mostra informações de um usuário"
 )
-async def userinfo(self, ctx: commands.Context, usuario: discord.Member = None):
+    async def userinfo(self, ctx: commands.Context, usuario: discord.Member = None):
     usuario = usuario or ctx.author
 
     roles = [role.mention for role in usuario.roles[1:]]
