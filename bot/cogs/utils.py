@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from db import get_user_stats
+from db import get_stats, add_mensagem, add_tempo_call, garantir_usuario_stats
 
 class Utils(commands.Cog):
     def __init__(self, bot):
