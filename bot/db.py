@@ -45,4 +45,70 @@ def init_db():
             );
             """)
 
+            # 📊 User Stats (mensagens + call)
+            cur.execute("""
+            CREATE TABLE IF NOT EXISTS user_stats (
+                user_id BIGINT PRIMARY KEY,
+                mensagens BIGINT DEFAULT 0,
+                tempo_call BIGINT DEFAULT 0
+            );
+            """)
+
     conn.close()
+
+# ───────────── STATS ─────────────
+
+def garantir_usuario_stats(user_id: int):
+    conn = get_conn()
+    with conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                "INSERT INTO user_stats (user_id) VALUES (%s) "
+                "ON CONFLICT (user_id) DO NOTHING;",
+                (user_id,)
+            )
+    conn.close()
+
+
+def add_mensagem(user_id: int):
+    conn = get_conn()
+    with conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                INSERT INTO user_stats (user_id, mensagens)
+                VALUES (%s, 1)
+                ON CONFLICT (user_id)
+                DO UPDATE SET mensagens = user_stats.mensagens + 1;
+                """,
+                (user_id,)
+            )
+    conn.close()
+
+
+def add_tempo_call(user_id: int, segundos: int):
+    conn = get_conn()
+    with conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                INSERT INTO user_stats (user_id, tempo_call)
+                VALUES (%s, %s)
+                ON CONFLICT (user_id)
+                DO UPDATE SET tempo_call = user_stats.tempo_call + %s;
+                """,
+                (user_id, segundos, segundos)
+            )
+    conn.close()
+
+
+def get_stats(user_id: int):
+    conn = get_conn()
+    with conn.cursor(cursor_factory=RealDictCursor) as cur:
+        cur.execute(
+            "SELECT mensagens, tempo_call FROM user_stats WHERE user_id = %s;",
+            (user_id,)
+        )
+        data = cur.fetchone()
+    conn.close()
+    return data
