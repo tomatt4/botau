@@ -13,7 +13,6 @@ class Utils(commands.Cog):
         if quantidade > 3000:
             await ctx.send("O máximo é **3000** mensagens.")
             return
-
         await ctx.channel.purge(limit=quantidade + 1)
         msg = await ctx.send(f"**{quantidade}** mensagens apagadas.")
         await msg.delete(delay=3)
@@ -22,7 +21,7 @@ class Utils(commands.Cog):
     @commands.hybrid_command(name="ping", description="Mostra a latência do bot")
     async def ping(self, ctx: commands.Context):
         latencia = round(self.bot.latency * 1000)
-        await ctx.send(f"Meu tempo de resposta é de {latencia} milisegundos.")
+        await ctx.send(f"Meu tempo de resposta é de {latencia} ms.")
 
     # /avatar
     @commands.hybrid_command(name="avatar", description="Mostra o avatar de um usuário")
@@ -39,17 +38,15 @@ class Utils(commands.Cog):
         roles = [role.mention for role in usuario.roles[1:]]
 
         # 🔍 Busca stats na DB
-        stats = get_user_stats(usuario.id)
+        stats = get_stats(usuario.id)
 
         if stats:
-            role_name = f"/{stats['role_name']}"
-            messages = stats["total_messages"]
-            seconds = stats["total_seconds"]
-            hours = seconds // 3600
-            minutes = (seconds % 3600) // 60
+            messages = stats.get("mensagens", 0)
+            segundos = stats.get("tempo_call", 0)
+            hours = segundos // 3600
+            minutes = (segundos % 3600) // 60
             tempo = f"{hours}h {minutes}min"
         else:
-            role_name = "Nenhum"
             messages = 0
             tempo = "0h 0min"
 
@@ -64,8 +61,7 @@ class Utils(commands.Cog):
         embed.add_field(name="Entrou no Servidor", value=usuario.joined_at.strftime("%d/%m/%Y"), inline=True)
         embed.add_field(name=f"Cargos ({len(roles)})", value=" ".join(roles) if roles else "Nenhum", inline=False)
 
-        # ⭐ PARTE NOVA (stats)
-        embed.add_field(name="Cargo monitorado", value=role_name, inline=True)
+        # ⭐ Stats
         embed.add_field(name="Mensagens", value=str(messages), inline=True)
         embed.add_field(name="Tempo ativo", value=tempo, inline=True)
 
@@ -77,20 +73,18 @@ class Utils(commands.Cog):
         guild = ctx.guild
         membros = guild.member_count
         bots = len([m for m in guild.members if m.bot])
-        humanos = membros - bots
         canais = len(guild.channels)
         categorias = len(guild.categories)
-        meta = 1000
-        faltando = max(0, meta - membros)
+        faltando = max(0, 1000 - membros)
 
         embed = discord.Embed(
             title=f"Informações do Servidor: {guild.name}",
             color=discord.Color.blurple()
         )
-        embed.add_field(name="Quantidade de canais", value=canais, inline=True)
-        embed.add_field(name="Quantidade de categorias", value=categorias, inline=True)
-        embed.add_field(name="Quantos bots", value=bots, inline=True)
-        embed.add_field(name="Quantos membros", value=membros, inline=True)
+        embed.add_field(name="Canais", value=canais, inline=True)
+        embed.add_field(name="Categorias", value=categorias, inline=True)
+        embed.add_field(name="Bots", value=bots, inline=True)
+        embed.add_field(name="Membros", value=membros, inline=True)
         embed.add_field(name="Meta de 1000 membros", value=f"Faltam **{faltando}** membros", inline=False)
 
         if guild.icon:
@@ -104,35 +98,16 @@ class Utils(commands.Cog):
     @commands.hybrid_command(name="help", description="Mostra informações do bot")
     async def help(self, ctx: commands.Context):
         embed = discord.Embed(
-            title="Seus comandos",
+            title="Comandos Disponíveis",
             description=(
-                "# Comandos Disponíveis:\n\n"
-                "- /ship \n"
-                "- /mute \n"
-                "- /ban \n"
-                "- /expulsar \n"
-                "- /afk \n"
-                "- /assumir \n"
-                "- /painel \n"
-                "- /avatar \n"
-                "- /help \n"
-                "- /casar \n"
-                "- /namorar \n"
-                "- /beijar \n"
-                "- /limpar \n"
-                "- /lembrete\n"
-                "- /presentear \n"
-                "- /ping \n"
-                "- /restaurar \n"
-                "- /warn \n"
-                "- /userinfo \n"
-                "- /serverinfo \n"
-                "- /numero\n"
+                "/ship, /mute, /ban, /expulsar, /afk, /assumir, /painel, /avatar, /help, /casar, /namorar, /beijar, "
+                "/limpar, /lembrete, /presentear, /ping, /restaurar, /warn, /userinfo, /serverinfo, /numero"
             ),
             color=0xFFFFFF
         )
-        embed.set_footer(text="Cada comando, cada sistema no bot tem a assinatura do Salvador. Fazer um bot desses NÃO é fácil!")
+        embed.set_footer(text="Cada sistema do bot tem a assinatura do Salvador. Fazer um bot desses NÃO é fácil!")
         await ctx.send(embed=embed)
+
 
 async def setup(bot):
     await bot.add_cog(Utils(bot))
