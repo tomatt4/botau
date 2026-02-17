@@ -1,7 +1,6 @@
 import discord
-import random
-from db import get_user_stats
 from discord.ext import commands
+from db import get_user_stats
 
 class Utils(commands.Cog):
     def __init__(self, bot):
@@ -18,8 +17,8 @@ class Utils(commands.Cog):
         await ctx.channel.purge(limit=quantidade + 1)
         msg = await ctx.send(f"**{quantidade}** mensagens apagadas.")
         await msg.delete(delay=3)
-        
-      # /ping
+
+    # /ping
     @commands.hybrid_command(name="ping", description="Mostra a latência do bot")
     async def ping(self, ctx: commands.Context):
         latencia = round(self.bot.latency * 1000)
@@ -34,62 +33,41 @@ class Utils(commands.Cog):
         await ctx.send(embed=embed)
 
     # /userinfo
-    @commands.hybrid_command(
-    name="userinfo",
-    description="Mostra informações de um usuário")
-    
+    @commands.hybrid_command(name="userinfo", description="Mostra informações de um usuário")
     async def userinfo(self, ctx: commands.Context, usuario: discord.Member = None):
         usuario = usuario or ctx.author
-
         roles = [role.mention for role in usuario.roles[1:]]
 
         # 🔍 Busca stats na DB
         stats = get_user_stats(usuario.id)
 
-    if stats:
-        role_name = f"/{stats['role_name']}"
-        messages = stats["total_messages"]
-        seconds = stats["total_seconds"]
+        if stats:
+            role_name = f"/{stats['role_name']}"
+            messages = stats["total_messages"]
+            seconds = stats["total_seconds"]
+            hours = seconds // 3600
+            minutes = (seconds % 3600) // 60
+            tempo = f"{hours}h {minutes}min"
+        else:
+            role_name = "Nenhum"
+            messages = 0
+            tempo = "0h 0min"
 
-        hours = seconds // 3600
-        minutes = (seconds % 3600) // 60
+        embed = discord.Embed(
+            title=f"Informações de {usuario.name}",
+            color=discord.Color.blue()
+        )
+        embed.set_thumbnail(url=usuario.display_avatar.url)
+        embed.add_field(name="ID", value=usuario.id, inline=True)
+        embed.add_field(name="Nickname", value=usuario.nick or "Nenhum", inline=True)
+        embed.add_field(name="Conta Criada", value=usuario.created_at.strftime("%d/%m/%Y"), inline=True)
+        embed.add_field(name="Entrou no Servidor", value=usuario.joined_at.strftime("%d/%m/%Y"), inline=True)
+        embed.add_field(name=f"Cargos ({len(roles)})", value=" ".join(roles) if roles else "Nenhum", inline=False)
 
-        tempo = f"{hours}h {minutes}min"
-    else:
-        role_name = "Nenhum"
-        messages = 0
-        tempo = "0h 0min"
-
-    embed = discord.Embed(
-        title=f"Informações de {usuario.name}",
-        color=discord.Color.blue()
-    )
-
-    embed.set_thumbnail(url=usuario.display_avatar.url)
-
-    embed.add_field(name="ID", value=usuario.id, inline=True)
-    embed.add_field(name="Nickname", value=usuario.nick or "Nenhum", inline=True)
-    embed.add_field(
-        name="Conta Criada",
-        value=usuario.created_at.strftime("%d/%m/%Y"),
-        inline=True
-    )
-    embed.add_field(
-        name="Entrou no Servidor",
-        value=usuario.joined_at.strftime("%d/%m/%Y"),
-        inline=True
-    )
-
-    embed.add_field(
-        name=f"Cargos ({len(roles)})",
-        value=" ".join(roles) if roles else "Nenhum",
-        inline=False
-    )
-
-    # ⭐ PARTE NOVA (stats)
-    embed.add_field(name="Cargo monitorado", value=role_name, inline=True)
-    embed.add_field(name="Mensagens", value=str(messages), inline=True)
-    embed.add_field(name="Tempo ativo", value=tempo, inline=True)
+        # ⭐ PARTE NOVA (stats)
+        embed.add_field(name="Cargo monitorado", value=role_name, inline=True)
+        embed.add_field(name="Mensagens", value=str(messages), inline=True)
+        embed.add_field(name="Tempo ativo", value=tempo, inline=True)
 
         await ctx.send(embed=embed)
 
@@ -121,7 +99,7 @@ class Utils(commands.Cog):
             embed.set_image(url=guild.banner.url)
 
         await ctx.send(embed=embed)
-        
+
     # /help
     @commands.hybrid_command(name="help", description="Mostra informações do bot")
     async def help(self, ctx: commands.Context):
@@ -129,7 +107,6 @@ class Utils(commands.Cog):
             title="Seus comandos",
             description=(
                 "# Comandos Disponíveis:\n\n"
-
                 "- /ship \n"
                 "- /mute \n"
                 "- /ban \n"
@@ -144,7 +121,7 @@ class Utils(commands.Cog):
                 "- /beijar \n"
                 "- /limpar \n"
                 "- /lembrete\n"
-                "- /presentear |\n"
+                "- /presentear \n"
                 "- /ping \n"
                 "- /restaurar \n"
                 "- /warn \n"
