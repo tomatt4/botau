@@ -2,11 +2,11 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-VIP_ID = 1473141093918052516
+VIP_ID = 1447756713146056745
 MAIORAL_ID = 1458661267572133939
 
-ROLE_ABAIXO = 1473141111982653522
-ROLE_ACIMA = 1457413011018092717
+ROLE_ABAIXO = 1449129118183456931
+ROLE_ACIMA = 1451412244029116436
 
 def tem_permissao(member: discord.Member):
     return any(role.id in (VIP_ID, MAIORAL_ID) for role in member.roles)
