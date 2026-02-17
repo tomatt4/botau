@@ -91,7 +91,7 @@ class Utils(commands.Cog):
     embed.add_field(name="Mensagens", value=str(messages), inline=True)
     embed.add_field(name="Tempo ativo", value=tempo, inline=True)
 
-    await ctx.send(embed=embed)
+        await ctx.send(embed=embed)
 
     # /serverinfo
     @commands.hybrid_command(name="serverinfo", description="Mostra informações do servidor")
