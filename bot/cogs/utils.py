@@ -36,15 +36,15 @@ class Utils(commands.Cog):
     # /userinfo
     @commands.hybrid_command(
     name="userinfo",
-    description="Mostra informações de um usuário"
-)
+    description="Mostra informações de um usuário")
+    
     async def userinfo(self, ctx: commands.Context, usuario: discord.Member = None):
-    usuario = usuario or ctx.author
+        usuario = usuario or ctx.author
 
-    roles = [role.mention for role in usuario.roles[1:]]
+        roles = [role.mention for role in usuario.roles[1:]]
 
-    # 🔍 Busca stats na DB
-    stats = get_user_stats(usuario.id)
+        # 🔍 Busca stats na DB
+        stats = get_user_stats(usuario.id)
 
     if stats:
         role_name = f"/{stats['role_name']}"
