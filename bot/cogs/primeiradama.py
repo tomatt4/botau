@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 
 INVITE_LINK = "https://discord.gg/h3nmQEGpq6"
-CARGO_ID = 1473883416876421305
+CARGO_ID = 123456789012345678  # Coloque o ID do cargo
 
 class PrimeiraDamaView(discord.ui.View):
     def __init__(self, bot):
@@ -11,7 +11,8 @@ class PrimeiraDamaView(discord.ui.View):
 
     @discord.ui.button(label="Verificar", style=discord.ButtonStyle.success, emoji="🔍")
     async def verificar(self, interaction: discord.Interaction, button: discord.ui.Button):
-        member = interaction.guild.get_member(interaction.user.id)
+        user = interaction.user  # User → tem a bio
+        member = interaction.guild.get_member(user.id)  # Member → pra adicionar cargo
         if not member:
             await interaction.response.send_message(
                 "Não consegui te encontrar no servidor.",
@@ -30,8 +31,7 @@ class PrimeiraDamaView(discord.ui.View):
         await interaction.response.defer(ephemeral=True)
 
         try:
-            user = interaction.user  # pega o User
-            bio = user.bio or ""     # bio pública
+            bio = user.bio or ""  # ✅ agora acessa a bio corretamente
 
             if INVITE_LINK.lower() in bio.lower():
                 await member.add_roles(cargo)
