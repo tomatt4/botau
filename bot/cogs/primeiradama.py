@@ -1,9 +1,14 @@
 import discord
 from discord.ext import commands
+from datetime import timedelta
+from db import get_conn
 
-INVITE_LINK = "https://discord.gg/h3nmQEGpq6"
 CARGO_ID = 1473883416876421305
+EXCLUSIVE_ROLE_ID = None
 
+# =========================
+# VIEW DO TICKET PARA PRIMEIRA DAMA
+# =========================
 class PrimeiraDamaView(discord.ui.View):
     def __init__(self, bot):
         super().__init__(timeout=None)
@@ -11,51 +16,74 @@ class PrimeiraDamaView(discord.ui.View):
 
     @discord.ui.button(label="Verificar", style=discord.ButtonStyle.success, emoji="🔍")
     async def verificar(self, interaction: discord.Interaction, button: discord.ui.Button):
-        user = interaction.user  # User → tem a bio
-        member = interaction.guild.get_member(user.id)  # Member → pra adicionar cargo
-        if not member:
+        await self.create_ticket(interaction)
+
+    async def create_ticket(self, interaction: discord.Interaction):
+        guild = interaction.guild
+        user = interaction.user
+        member = guild.get_member(user.id)
+
+        if not guild or not member:
             await interaction.response.send_message(
                 "Não consegui te encontrar no servidor.",
                 ephemeral=True
             )
             return
 
-        cargo = interaction.guild.get_role(CARGO_ID)
-        if not cargo:
-            await interaction.response.send_message(
-                "Cargo não encontrado no servidor.",
-                ephemeral=True
-            )
-            return
+        category = discord.utils.get(guild.categories, name="𝐏𝐫𝐢𝐦𝐞𝐢𝐫𝐚 𝐃𝐚𝐦𝐚")
+        if not category:
+            category = await guild.create_category("𝐏𝐫𝐢𝐦𝐞𝐢𝐫𝐚 𝐃𝐚𝐦𝐚")
 
-        await interaction.response.defer(ephemeral=True)
+        overwrites = {
+            guild.default_role: discord.PermissionOverwrite(read_messages=False),
+            member: discord.PermissionOverwrite(read_messages=True, send_messages=True),
+            guild.me: discord.PermissionOverwrite(read_messages=True, send_messages=True),
+        }
 
+        # Permissões para admins
+        for role in guild.roles:
+            if role.permissions.administrator:
+                overwrites[role] = discord.PermissionOverwrite(
+                    read_messages=True, send_messages=True
+                )
+
+        channel_name = f"primeira-dama-{user.name}"
+        channel = await guild.create_text_channel(
+            name=channel_name,
+            category=category,
+            overwrites=overwrites
+        )
+
+        # Salvar no banco
         try:
-            bio = user.bio or ""  # ✅ agora acessa a bio corretamente
-
-            if INVITE_LINK.lower() in bio.lower():
-                await member.add_roles(cargo)
-                await member.send(
-                    "✅ **Verificação aprovada!** Cargo **Primeira Dama** concedido 🎉"
-                )
-            else:
-                await member.send(
-                    "❌ Link do servidor não encontrado na sua bio.\n"
-                    f"Por favor, adicione `{INVITE_LINK}` na sua bio e tente novamente."
-                )
-
-        except discord.Forbidden:
-            await interaction.followup.send(
-                "Não consigo enviar DM pra você. Ative suas DMs e tente novamente.",
-                ephemeral=True
+            conn = get_conn()
+            cur = conn.cursor()
+            cur.execute(
+                "INSERT INTO tickets (user_id, channel_id, type) VALUES (%s, %s, %s)",
+                (str(user.id), str(channel.id), "Primeira Dama")
             )
-        except Exception as e:
-            await interaction.followup.send(
-                f"Ocorreu um erro ao verificar sua bio: {e}",
-                ephemeral=True
-            )
+            conn.commit()
+        finally:
+            cur.close()
+            conn.close()
+
+        await interaction.response.send_message(
+            f"Ticket criado: {channel.mention}", ephemeral=True
+        )
+
+        exclusive_role_mention = f"<@&{EXCLUSIVE_ROLE_ID}>"
+        await channel.send(
+            f"{user.mention} {exclusive_role_mention}\n\n"
+            f"***Boas vindas ao seu Ticket de Primeira Dama!***\n"
+            f"Aqui a staff irá verificar seu print do perfil.\n"
+            f"Apenas **administradores** podem visualizar este canal.\n\n"
+            f"Envie o print do seu perfil quando estiver pronto."
+        )
 
 
+# =========================
+# COG PRIMEIRA DAMA
+# =========================
 class PrimeiraDama(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -66,9 +94,9 @@ class PrimeiraDama(commands.Cog):
             title="Cargo Primeira Dama",
             description=(
                 "O cargo **Primeira Dama** é um cargo especial para quem ajuda "
-                "a divulgar o servidor\n\n"
-                "Ao clicar em **Verificar**, o bot vai checar sua bio "
-                "automaticamente para confirmar se o link do servidor está visível."
+                "a divulgar o servidor.\n\n"
+                "Clique em **Verificar** abaixo para abrir um ticket e enviar seu print do perfil. "
+                "A staff irá analisar e conceder o cargo."
             ),
             color=discord.Color.pink()
         )
@@ -87,8 +115,9 @@ class PrimeiraDama(commands.Cog):
         embed.add_field(
             name="Como obter",
             value=(
-                f"• Coloque o link `{INVITE_LINK}` na sua bio\n"
-                "• Clique em **Verificar**"
+                "• Clique em **Verificar**\n"
+                "• Abra um ticket e envie o print do seu perfil\n"
+                "• A staff irá conferir e conceder o cargo"
             ),
             inline=False
         )
