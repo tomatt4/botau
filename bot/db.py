@@ -121,4 +121,48 @@ def get_stats(user_id: int):
         )
         data = cur.fetchone()
     conn.close()
+
+# ───────────── TELLONYM ─────────────
+
+def add_tellonym(message: str):
+    conn = get_conn()
+    with conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                "INSERT INTO tellonym (message) VALUES (%s);",
+                (message,)
+            )
+    conn.close()
+
+
+def get_tellonyms(limit=10):
+    conn = get_conn()
+    with conn.cursor(cursor_factory=RealDictCursor) as cur:
+        cur.execute(
+            """
+            SELECT id, message, replied, created_at
+            FROM tellonym
+            ORDER BY created_at DESC
+            LIMIT %s;
+            """,
+            (limit,)
+        )
+        data = cur.fetchall()
+    conn.close()
+    return data
+
+
+def reply_tellonym(tellonym_id: int, reply: str):
+    conn = get_conn()
+    with conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                UPDATE tellonym
+                SET replied = TRUE, reply = %s
+                WHERE id = %s;
+                """,
+                (reply, tellonym_id)
+            )
+    conn.close()
     return data
