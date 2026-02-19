@@ -14,7 +14,7 @@ class PrimeiraDamaView(discord.ui.View):
         super().__init__(timeout=None)
         self.bot = bot
 
-    @discord.ui.button(label="Resgatar", style=discord.ButtonStyle.success)
+    @discord.ui.button(label="Resgatar", style=discord.ButtonStyle.success, emoji="<:anel:1473912899809579040>")
     async def verificar(self, interaction: discord.Interaction, button: discord.ui.Button):
         await self.create_ticket(interaction)
 
