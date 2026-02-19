@@ -93,7 +93,7 @@ class PrimeiraDama(commands.Cog):
         embed = discord.Embed(
             title="Cargo Primeira Dama",
             description=(
-                "# <@&1473878349775507579>"
+                "# <@&1473878349775507579>\n"
                 "**Primeira Dama** – Receba esse título especial por ajudar a espalhar "
                 "nosso servidor. Quem coloca **/sph** na bio ganha esse reconhecimento VIP, "
                 "mostrando que você é essencial na divulgação e no crescimento da nossa comunidade."
