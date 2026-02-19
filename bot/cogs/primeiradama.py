@@ -4,7 +4,7 @@ import asyncio
 from discord.ext import commands
 
 INVITE_LINK = "https://discord.gg/h3nmQEGpq6"
-CARGO_ID = 123456789012345678  # ← coloque o ID do cargo aqui
+CARGO_ID = 1473883416876421305
 
 async def extrair_texto_da_imagem(image_bytes, api_key):
     url = "https://api.ocr.space/parse/image"
