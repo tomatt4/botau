@@ -43,7 +43,7 @@ class PrimeiraDamaView(discord.ui.View):
         super().__init__(timeout=None)
         self.bot = bot
 
-    @discord.ui.button(label="Verificar", style=discord.ButtonStyle.pink, emoji="🔍")
+    @discord.ui.button(label="Verificar", style=discord.ButtonStyle.success, emoji="🔍")
     async def verificar(self, interaction: discord.Interaction, button: discord.ui.Button):
         member = interaction.user
         guild = interaction.guild
