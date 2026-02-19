@@ -14,7 +14,7 @@ class PrimeiraDamaView(discord.ui.View):
         super().__init__(timeout=None)
         self.bot = bot
 
-    @discord.ui.button(label="Verificar", style=discord.ButtonStyle.success, emoji="🔍")
+    @discord.ui.button(label="Resgatar", style=discord.ButtonStyle.success, emoji="")
     async def verificar(self, interaction: discord.Interaction, button: discord.ui.Button):
         await self.create_ticket(interaction)
 
@@ -93,10 +93,10 @@ class PrimeiraDama(commands.Cog):
         embed = discord.Embed(
             title="Cargo Primeira Dama",
             description=(
-                "O cargo **Primeira Dama** é um cargo especial para quem ajuda "
-                "a divulgar o servidor.\n\n"
-                "Clique em **Verificar** abaixo para abrir um ticket e enviar seu print do perfil. "
-                "A staff irá analisar e conceder o cargo."
+                "# <@&1473878349775507579>"
+                "**Primeira Dama** – Receba esse título especial por ajudar a espalhar "
+                "nosso servidor. Quem coloca **/sph** na bio ganha esse reconhecimento VIP, "
+                "mostrando que você é essencial na divulgação e no crescimento da nossa comunidade."
             ),
             color=0xFFFFFF
         )
@@ -104,10 +104,11 @@ class PrimeiraDama(commands.Cog):
         embed.add_field(
             name="Benefícios",
             value=(
-                "3x EXP\n"
-                "Pode conceder o cargo para até 2 pessoas\n"
-                "GIFs, áudios e anexos liberados\n"
-                "Prioridade de voz nas calls"
+                "1. 3x EXP na Loritta\n"
+                "2. Pode conceder o cargo para até 2 pessoas\n"
+                "3. GIFs, áudios e anexos liberados\n"
+                "4. Prioridade de voz nas calls\n"
+                "5. Comandos customizados no bot Sukuna"
             ),
             inline=False
         )
@@ -115,7 +116,7 @@ class PrimeiraDama(commands.Cog):
         embed.add_field(
             name="Como obter",
             value=(
-                "• Clique em **Verificar**\n"
+                "• Clique em **Resgatar**\n"
                 "• Abra um ticket e envie o print do seu perfil\n"
                 "• A staff irá conferir e conceder o cargo"
             ),
