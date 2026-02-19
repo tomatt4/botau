@@ -77,7 +77,7 @@ class PrimeiraDamaView(discord.ui.View):
             f"***Boas vindas ao seu Ticket de Primeira Dama!***\n"
             f"Aqui a staff irá verificar seu print do perfil.\n"
             f"Apenas **administradores** podem visualizar este canal.\n\n"
-            f"Envie o print do seu perfil quando estiver pronto."
+            f"Envie o print do seu perfil com o **/sph** na sua bio quando estiver pronto."
         )
 
 
