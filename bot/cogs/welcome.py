@@ -13,7 +13,7 @@ class Welcome(commands.Cog):
         if not channel:
             return
 
-        await channel.send(f"{member.mention} entrou no servidor!\n\n-# <@&1420778000504324238>")
+        await channel.send(f"**Boas vindas à Spider Hub {member.mention}!**\n\n- **Quer mostrar que time você é? Vá em <#1450943288533323879>!**\n\n- **Ficou interessado em um VIP? Veja os preços na categoria 𝐋𝐨𝐣𝐚!**")
 
 async def setup(bot):
     await bot.add_cog(Welcome(bot))
