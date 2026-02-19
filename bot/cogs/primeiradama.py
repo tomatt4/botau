@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 
 INVITE_LINK = "https://discord.gg/h3nmQEGpq6"
-CARGO_ID = 1473883416876421305
+CARGO_ID = 123456789012345678  # Coloque o ID do cargo
 
 class PrimeiraDamaView(discord.ui.View):
     def __init__(self, bot):
@@ -27,14 +27,13 @@ class PrimeiraDamaView(discord.ui.View):
             )
             return
 
-        await interaction.response.defer(ephemeral=True)  # responde rápido pro Discord
+        await interaction.response.defer(ephemeral=True)
 
         try:
-            # Buscar perfil do usuário
-            profile = await member.fetch_profile()
-            bio = profile.bio.lower() if profile.bio else ""
+            user = interaction.user  # pega o User
+            bio = user.bio or ""     # bio pública
 
-            if INVITE_LINK.lower() in bio:
+            if INVITE_LINK.lower() in bio.lower():
                 await member.add_roles(cargo)
                 await member.send(
                     "✅ **Verificação aprovada!** Cargo **Primeira Dama** concedido 🎉"
