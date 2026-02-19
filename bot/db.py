@@ -57,13 +57,11 @@ def init_db():
             cur.execute("""
             CREATE TABLE IF NOT EXISTS tellonym (
             id SERIAL PRIMARY KEY,
+            user_id BIGINT NOT NULL,
             message TEXT NOT NULL,
-            replied BOOLEAN DEFAULT FALSE,
-            reply TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
             """)
-
     conn.close()
 
 # ───────────── STATS ─────────────
