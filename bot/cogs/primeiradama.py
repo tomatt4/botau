@@ -60,11 +60,11 @@ class PrimeiraDamaView(discord.ui.View):
             )
             return
 
+        # Mensagem inicial pedindo o print
         try:
             await member.send(
                 "**Verificação – Primeira Dama**\n\n"
-                "Envie um **print do seu perfil** mostrando o link do servidor "
-                "(bio, status ou pronome).\n\n"
+                "Envie um **print do seu perfil** mostrando o link do servidor.\n\n"
                 "Você tem **2 minutos**."
             )
         except discord.Forbidden:
@@ -79,15 +79,18 @@ class PrimeiraDamaView(discord.ui.View):
             ephemeral=True
         )
 
+        # Check confiável para DM
         def check(msg):
             return (
-                msg.author.id == member.id
-                and isinstance(msg.channel, discord.DMChannel)
+                msg.author.id == interaction.user.id  # compara com o User que clicou
+                and msg.guild is None                 # só DMs
                 and msg.attachments
             )
 
         try:
             msg = await self.bot.wait_for("message", timeout=120, check=check)
+            await member.send("Recebi sua imagem, processando... 🔍")  # feedback imediato
+
             attachment = msg.attachments[0]
 
             # Aceita mais tipos de imagem
@@ -99,16 +102,13 @@ class PrimeiraDamaView(discord.ui.View):
                 async with session.get(attachment.url) as resp:
                     image_bytes = await resp.read()
 
-            texto = await extrair_texto_da_imagem(
-                image_bytes,
-                self.bot.OCR_API_KEY
-            )
+            texto = await extrair_texto_da_imagem(image_bytes, self.bot.OCR_API_KEY)
 
             if not texto:
                 await member.send("Não consegui ler o texto da imagem. Certifique-se de que o print esteja legível.")
                 return
 
-            print(f"OCR retornou: {texto}")  # 🔍 debug
+            print(f"OCR retornou: {texto}")  # 🔍 debug no console
 
             # Comparação mais tolerante: ignora espaços e quebras de linha
             texto_limpo = texto.replace(" ", "").replace("\n", "")
@@ -116,10 +116,7 @@ class PrimeiraDamaView(discord.ui.View):
 
             if link_limpo in texto_limpo:
                 await member.add_roles(cargo)
-                await member.send(
-                    "**Verificação aprovada!**\n"
-                    "Cargo **Primeira Dama** concedido 🎉"
-                )
+                await member.send("**Verificação aprovada!** 🎉 Cargo concedido!")
             else:
                 await member.send(
                     "Link do servidor não encontrado no print.\n"
