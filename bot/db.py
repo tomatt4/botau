@@ -1,13 +1,18 @@
 import os
 import psycopg2
 from psycopg2.extras import RealDictCursor
+from datetime import datetime, timedelta
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
 
+# ───────────── CONEXÃO ─────────────
+
 def get_conn():
     return psycopg2.connect(DATABASE_URL)
 
+
+# ───────────── INIT DB ─────────────
 
 def init_db():
     conn = get_conn()
@@ -45,7 +50,7 @@ def init_db():
             );
             """)
 
-            # 📊 User Stats (mensagens + call)
+            # 📊 User Stats
             cur.execute("""
             CREATE TABLE IF NOT EXISTS user_stats (
                 user_id BIGINT PRIMARY KEY,
@@ -53,16 +58,19 @@ def init_db():
                 tempo_call BIGINT DEFAULT 0
             );
             """)
-            # 📬 Tellonym
+
+            # 📬 Tellonym (público, anônimo, com cooldown)
             cur.execute("""
             CREATE TABLE IF NOT EXISTS tellonym (
-            id SERIAL PRIMARY KEY,
-            user_id BIGINT NOT NULL,
-            message TEXT NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                id SERIAL PRIMARY KEY,
+                user_id BIGINT NOT NULL,
+                message TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
             """)
+
     conn.close()
+
 
 # ───────────── STATS ─────────────
 
@@ -71,8 +79,11 @@ def garantir_usuario_stats(user_id: int):
     with conn:
         with conn.cursor() as cur:
             cur.execute(
-                "INSERT INTO user_stats (user_id) VALUES (%s) "
-                "ON CONFLICT (user_id) DO NOTHING;",
+                """
+                INSERT INTO user_stats (user_id)
+                VALUES (%s)
+                ON CONFLICT (user_id) DO NOTHING;
+                """,
                 (user_id,)
             )
     conn.close()
@@ -114,31 +125,70 @@ def get_stats(user_id: int):
     conn = get_conn()
     with conn.cursor(cursor_factory=RealDictCursor) as cur:
         cur.execute(
-            "SELECT mensagens, tempo_call FROM user_stats WHERE user_id = %s;",
+            """
+            SELECT mensagens, tempo_call
+            FROM user_stats
+            WHERE user_id = %s;
+            """,
             (user_id,)
         )
         data = cur.fetchone()
     conn.close()
+    return data
+
 
 # ───────────── TELLONYM ─────────────
 
-def add_tellonym(message: str):
-    conn = get_conn()
-    with conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                "INSERT INTO tellonym (message) VALUES (%s);",
-                (message,)
-            )
-    conn.close()
-
-
-def get_tellonyms(limit=10):
+def pode_enviar_tellonym(user_id: int) -> bool:
+    """
+    Retorna True se o usuário puder enviar outro Tellonym
+    (cooldown de 1 hora).
+    """
     conn = get_conn()
     with conn.cursor(cursor_factory=RealDictCursor) as cur:
         cur.execute(
             """
-            SELECT id, message, replied, created_at
+            SELECT created_at
+            FROM tellonym
+            WHERE user_id = %s
+            ORDER BY created_at DESC
+            LIMIT 1;
+            """,
+            (user_id,)
+        )
+        last = cur.fetchone()
+    conn.close()
+
+    # nunca enviou
+    if not last:
+        return True
+
+    agora = datetime.utcnow()
+    ultima = last["created_at"]
+
+    return (agora - ultima) >= timedelta(hours=1)
+
+
+def add_tellonym(user_id: int, message: str):
+    conn = get_conn()
+    with conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                INSERT INTO tellonym (user_id, message)
+                VALUES (%s, %s);
+                """,
+                (user_id, message)
+            )
+    conn.close()
+
+
+def get_tellonyms(limit: int = 10):
+    conn = get_conn()
+    with conn.cursor(cursor_factory=RealDictCursor) as cur:
+        cur.execute(
+            """
+            SELECT id, message, created_at
             FROM tellonym
             ORDER BY created_at DESC
             LIMIT %s;
@@ -146,21 +196,5 @@ def get_tellonyms(limit=10):
             (limit,)
         )
         data = cur.fetchall()
-    conn.close()
-    return data
-
-
-def reply_tellonym(tellonym_id: int, reply: str):
-    conn = get_conn()
-    with conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                """
-                UPDATE tellonym
-                SET replied = TRUE, reply = %s
-                WHERE id = %s;
-                """,
-                (reply, tellonym_id)
-            )
     conn.close()
     return data
