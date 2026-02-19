@@ -1,41 +1,8 @@
 import discord
-import aiohttp
-import asyncio
 from discord.ext import commands
 
 INVITE_LINK = "https://discord.gg/h3nmQEGpq6"
-CARGO_ID = 1473883416876421305
-
-async def extrair_texto_da_imagem(image_bytes, api_key):
-    url = "https://api.ocr.space/parse/image"
-    params = {
-        "apikey": api_key,
-        "language": "por",
-        "OCREngine": 2,
-        "isOverlayRequired": False
-    }
-
-    data = aiohttp.FormData()
-    data.add_field(
-        "file",
-        image_bytes,
-        filename="imagem.png",
-        content_type="image/png"
-    )
-
-    async with aiohttp.ClientSession() as session:
-        async with session.post(url, data=data, params=params) as resp:
-            result = await resp.json()
-
-    if result.get("IsErroredOnProcessing"):
-        return None
-
-    parsed = result.get("ParsedResults")
-    if not parsed:
-        return None
-
-    return parsed[0].get("ParsedText", "").lower()
-
+CARGO_ID = 123456789012345678  # Coloque o ID do cargo aqui
 
 class PrimeiraDamaView(discord.ui.View):
     def __init__(self, bot):
@@ -60,76 +27,39 @@ class PrimeiraDamaView(discord.ui.View):
             )
             return
 
-        try:
-            await member.send(
-                "**Verificação – Primeira Dama**\n\n"
-                "Envie um **print do seu perfil** mostrando o link do servidor.\n\n"
-                "Você tem **2 minutos**."
-            )
-        except discord.Forbidden:
-            await interaction.response.send_message(
-                "Ative suas DMs e tente novamente.",
-                ephemeral=True
-            )
-            return
-
-        await interaction.response.send_message(
-            "Te mandei uma DM! Envie a imagem lá",
-            ephemeral=True
-        )
-
-        # Check confiável para DM
-        def check(msg):
-            return (
-                msg.author.id == interaction.user.id
-                and msg.guild is None
-                and msg.attachments
-            )
+        await interaction.response.defer(ephemeral=True)  # responde rápido pro Discord
 
         try:
-            msg = await self.bot.wait_for("message", timeout=120, check=check)
-            await member.send("Recebi sua imagem, processando... 🔍")
+            # Buscar perfil do usuário
+            profile = await member.fetch_profile()
+            bio = profile.bio.lower() if profile.bio else ""
 
-            attachment = msg.attachments[0]
-
-            if not attachment.filename.lower().endswith((".png", ".jpg", ".jpeg", ".webp")):
-                await member.send("Isso não parece uma imagem válida (.png, .jpg, .jpeg, .webp).")
-                return
-
-            async with aiohttp.ClientSession() as session:
-                async with session.get(attachment.url) as resp:
-                    image_bytes = await resp.read()
-
-            texto = await extrair_texto_da_imagem(image_bytes, self.bot.OCR_API_KEY)
-
-            if not texto:
-                await member.send("❌ Não consegui ler o texto da imagem. Certifique-se de que o print esteja legível.")
-                return
-
-            # Limpa texto para comparação
-            texto_limpo = texto.replace(" ", "").replace("\n", "")
-            link_limpo = INVITE_LINK.split("//")[1].lower()
-
-            # Mostra para o usuário o que o OCR leu
-            await member.send(f"📄 OCR detectou o seguinte texto:\n```\n{texto}\n```")
-
-            if link_limpo in texto_limpo:
+            if INVITE_LINK.lower() in bio:
                 await member.add_roles(cargo)
-                await member.send("✅ **Verificação aprovada!** Cargo **Primeira Dama** concedido 🎉")
+                await member.send(
+                    "✅ **Verificação aprovada!** Cargo **Primeira Dama** concedido 🎉"
+                )
             else:
                 await member.send(
-                    "❌ Link do servidor não encontrado no print.\n"
-                    "Confere se o link está legível e tente novamente."
+                    "❌ Link do servidor não encontrado na sua bio.\n"
+                    f"Por favor, adicione `{INVITE_LINK}` na sua bio e tente novamente."
                 )
 
-        except asyncio.TimeoutError:
-            await member.send("⏱️ Tempo esgotado. Clique no botão novamente.")
+        except discord.Forbidden:
+            await interaction.followup.send(
+                "Não consigo enviar DM pra você. Ative suas DMs e tente novamente.",
+                ephemeral=True
+            )
+        except Exception as e:
+            await interaction.followup.send(
+                f"Ocorreu um erro ao verificar sua bio: {e}",
+                ephemeral=True
+            )
 
 
 class PrimeiraDama(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.bot.OCR_API_KEY = bot.OCR_API_KEY
 
     @commands.command()
     async def primeiradama(self, ctx):
@@ -138,9 +68,8 @@ class PrimeiraDama(commands.Cog):
             description=(
                 "O cargo **Primeira Dama** é um cargo especial para quem ajuda "
                 "a divulgar o servidor\n\n"
-                "Ao clicar em **Verificar**, o bot vai pedir um print do seu perfil "
-                "e analisar automaticamente a imagem para confirmar se o link "
-                "do servidor está visível."
+                "Ao clicar em **Verificar**, o bot vai checar sua bio "
+                "automaticamente para confirmar se o link do servidor está visível."
             ),
             color=discord.Color.pink()
         )
@@ -159,9 +88,8 @@ class PrimeiraDama(commands.Cog):
         embed.add_field(
             name="Como obter",
             value=(
-                "• Coloque o link do servidor no seu perfil\n"
-                "• Clique em **Verificar**\n"
-                "• Envie o print solicitado na DM"
+                f"• Coloque o link `{INVITE_LINK}` na sua bio\n"
+                "• Clique em **Verificar**"
             ),
             inline=False
         )
