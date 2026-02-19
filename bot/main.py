@@ -42,6 +42,7 @@ class RizeBot(commands.Bot):
         await self.load_extension("cogs.tomate")
         await self.load_extension("cogs.status")
         await self.load_extension("cogs.cargo")
+        await self.load_extension("cogs.primeiradama")
 
         print("Lumi: Cogs carregados")
 
@@ -64,4 +65,5 @@ class RizeBot(commands.Bot):
 keep_alive()
 bot = RizeBot()
 TOKEN = os.getenv("DISCORD_TOKEN")
+OCR_API_KEY = os.getenv("OCR_SPACE_API_KEY")
 bot.run(TOKEN)
