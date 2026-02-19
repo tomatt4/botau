@@ -4,7 +4,7 @@ from datetime import timedelta
 from db import get_conn
 
 CARGO_ID = 1473878349775507579
-EXCLUSIVE_ROLE_ID = 
+EXCLUSIVE_ROLE_ID = 1447395230646140999
 
 # =========================
 # VIEW DO TICKET PARA PRIMEIRA DAMA
