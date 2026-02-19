@@ -3,8 +3,8 @@ from discord.ext import commands
 from datetime import timedelta
 from db import get_conn
 
-CARGO_ID = 1473883416876421305
-EXCLUSIVE_ROLE_ID = None
+CARGO_ID = 1473878349775507579
+EXCLUSIVE_ROLE_ID = 
 
 # =========================
 # VIEW DO TICKET PARA PRIMEIRA DAMA
@@ -30,9 +30,9 @@ class PrimeiraDamaView(discord.ui.View):
             )
             return
 
-        category = discord.utils.get(guild.categories, name="𝐏𝐫𝐢𝐦𝐞𝐢𝐫𝐚 𝐃𝐚𝐦𝐚")
+        category = discord.utils.get(guild.categories, name="𝐈𝐧𝐟𝐨𝐫𝐦𝐚çõ𝐞𝐬")
         if not category:
-            category = await guild.create_category("𝐏𝐫𝐢𝐦𝐞𝐢𝐫𝐚 𝐃𝐚𝐦𝐚")
+            category = await guild.create_category("𝐈𝐧𝐟𝐨𝐫𝐦𝐚çõ𝐞𝐬")
 
         overwrites = {
             guild.default_role: discord.PermissionOverwrite(read_messages=False),
