@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 
 INVITE_LINK = "https://discord.gg/h3nmQEGpq6"
-CARGO_ID = 123456789012345678  # Coloque o ID do cargo
+CARGO_ID = 1473883416876421305
 
 class PrimeiraDamaView(discord.ui.View):
     def __init__(self, bot):
