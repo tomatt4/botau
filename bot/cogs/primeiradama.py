@@ -98,7 +98,7 @@ class PrimeiraDama(commands.Cog):
                 "Clique em **Verificar** abaixo para abrir um ticket e enviar seu print do perfil. "
                 "A staff irá analisar e conceder o cargo."
             ),
-            color=discord.Color.pink()
+            color=0xFFFFFF
         )
 
         embed.add_field(
@@ -107,7 +107,7 @@ class PrimeiraDama(commands.Cog):
                 "3x EXP\n"
                 "Pode conceder o cargo para até 2 pessoas\n"
                 "GIFs, áudios e anexos liberados\n"
-                "Prioridade nas calls"
+                "Prioridade de voz nas calls"
             ),
             inline=False
         )
@@ -121,7 +121,7 @@ class PrimeiraDama(commands.Cog):
             ),
             inline=False
         )
-
+        embed.set_image(url="https://media.discordapp.net/attachments/1457448153174376708/1474084563184648333/Logomarca_loja_de_moda_feminina_moderno_vermelho_20260219_133148_0000.png?ex=69988fbb&is=69973e3b&hm=7e174c95aa7a4666c8158c3479d85946d5d6c85ac863a7a5f970a0b29b131556&=&format=webp&quality=lossless&width=1214&height=759")
         await ctx.send(embed=embed, view=PrimeiraDamaView(self.bot))
 
 
