@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 
 class Embeds(commands.Cog):
-    def init(self, bot):
+    def __init__(self, bot): # Ajustado para __init__
         self.bot = bot
 
     @commands.command(name="cinco_embeds")
@@ -28,8 +28,7 @@ class Embeds(commands.Cog):
             "- *Gerenciar Figurinhas e Emojis*\n"
             "- *Autoridade Sobre os Membros*\n"
             "- *3.2x EXP na Loritta*\n"
-            "- *Conceder o cargo Primeira Dama a 2 Membros*\n"
-            
+            "- *Conceder o cargo Primeira Dama a 2 Membros*\n\n" # Adicionada quebra e vírgula abaixo
             "# Preço: 50K de Sonhos",
             color=0x000001
         )
@@ -40,7 +39,6 @@ class Embeds(commands.Cog):
             "- *Comando personalizado no Sukuna*\n"
             "- *Direito a dar o cargo Primeira Dama a 4 membros*\n"
             "- *Desconto de 5,8% nas Cores Personalizadas e Ícones Personalizados*\n\n"
-            
             "# Preço: 58.5K de Sonhos",
             color=0xFFFF00
         )
@@ -52,23 +50,20 @@ class Embeds(commands.Cog):
             "- *Contato direto com o <@&1446602002246406279> a qualquer hora(na DM)*\n"
             "- *Sugestões com Prioridade*\n"
             "- *5x EXP na Loritta*\n\n"
-            
             "# Preço: 65.1K de Sonhos",
             color=0x5865F2
         )
         embed5 = discord.Embed(
             title="",
-            description="# *<@&1474103692264476762>*"
-            "- *Todas as permissões do <@&1474103543299575818>*"
-            "- *Desconto de 23% nas Cores Personalizadas e Ícones Personalizados*"
+            description="# *<@&1474103692264476762>*\n\n" # Adicionada quebra
+            "- *Todas as permissões do <@&1474103543299575818>*\n"
+            "- *Desconto de 23% nas Cores Personalizadas e Ícones Personalizados*\n"
             "- *6x EXP na Loritta*",
             color=0xFFBF00
         )
-        # Enviando todos
+        
         for embed in [embed1, embed2, embed3, embed4, embed5]:
             await ctx.send(embed=embed)
 
-
-# Para adicionar o cog no bot principal
 async def setup(bot):
-    await.bot.add_cog(Embeds(bot))
+    await bot.add_cog(Embeds(bot)) # Removido o ponto após await
