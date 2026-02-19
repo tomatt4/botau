@@ -8,6 +8,9 @@ from keepalive import keep_alive
 # 👇 IMPORT DO BANCO
 from db import init_db
 
+TOKEN = os.getenv("DISCORD_TOKEN")
+OCR_API_KEY = os.getenv("OCR_SPACE_API_KEY")
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 load_dotenv()
 
@@ -21,6 +24,7 @@ class RizeBot(commands.Bot):
             help_command=None,
             activity=discord.Game(name="ashjufgweis | /help")
         )
+
 
     async def setup_hook(self):
         # 📦 Carregar cogs
@@ -64,6 +68,4 @@ class RizeBot(commands.Bot):
 
 keep_alive()
 bot = RizeBot()
-TOKEN = os.getenv("DISCORD_TOKEN")
-OCR_API_KEY = os.getenv("OCR_SPACE_API_KEY")
 bot.run(TOKEN)
