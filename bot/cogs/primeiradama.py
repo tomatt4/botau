@@ -6,7 +6,6 @@ from discord.ext import commands
 INVITE_LINK = "https://discord.gg/h3nmQEGpq6"
 CARGO_NOME = "Primeira Dama"
 
-
 async def extrair_texto_da_imagem(image_bytes, api_key):
     url = "https://api.ocr.space/parse/image"
     params = {
@@ -45,9 +44,16 @@ class PrimeiraDamaView(discord.ui.View):
 
     @discord.ui.button(label="Verificar", style=discord.ButtonStyle.success, emoji="🔍")
     async def verificar(self, interaction: discord.Interaction, button: discord.ui.Button):
-        member = interaction.user
-        guild = interaction.guild
+        # Pega o Member do servidor, não só o User
+        member = interaction.guild.get_member(interaction.user.id)
+        if not member:
+            await interaction.response.send_message(
+                "Não consegui te encontrar no servidor.",
+                ephemeral=True
+            )
+            return
 
+        guild = interaction.guild
         cargo = discord.utils.get(guild.roles, name=CARGO_NOME)
         if not cargo:
             await interaction.response.send_message(
@@ -65,7 +71,7 @@ class PrimeiraDamaView(discord.ui.View):
             )
         except discord.Forbidden:
             await interaction.response.send_message(
-                "Ative sua DM e tente novamente.",
+                "Ative suas DMs e tente novamente.",
                 ephemeral=True
             )
             return
@@ -77,7 +83,7 @@ class PrimeiraDamaView(discord.ui.View):
 
         def check(msg):
             return (
-                msg.author == member
+                msg.author.id == member.id
                 and isinstance(msg.channel, discord.DMChannel)
                 and msg.attachments
             )
@@ -86,7 +92,7 @@ class PrimeiraDamaView(discord.ui.View):
             msg = await self.bot.wait_for("message", timeout=120, check=check)
             attachment = msg.attachments[0]
 
-            if not attachment.content_type.startswith("image"):
+            if not attachment.content_type or not attachment.content_type.startswith("image"):
                 await member.send("Isso não é uma imagem válida.")
                 return
 
