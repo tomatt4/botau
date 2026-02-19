@@ -70,5 +70,5 @@ class Embeds(commands.Cog):
 
 
 # Para adicionar o cog no bot principal
-def setup(bot):
-    bot.add_cog(Embeds(bot))
+async def setup(bot):
+    await.bot.add_cog(Embeds(bot))
