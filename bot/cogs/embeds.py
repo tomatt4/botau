@@ -30,7 +30,7 @@ class Embeds(commands.Cog):
             "- *3.2x EXP na Loritta*\n"
             "- *Conceder o cargo Primeira Dama a 2 Membros*\n"
             
-            "# Preço: 50K de Sonhos,
+            "# Preço: 50K de Sonhos",
             color=0x000001
         )
         embed3 = discord.Embed(
