@@ -53,6 +53,16 @@ def init_db():
                 tempo_call BIGINT DEFAULT 0
             );
             """)
+            # 📬 Tellonym
+            cur.execute("""
+            CREATE TABLE IF NOT EXISTS tellonym (
+            id SERIAL PRIMARY KEY,
+            message TEXT NOT NULL,
+            replied BOOLEAN DEFAULT FALSE,
+            reply TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+            """)
 
     conn.close()
 
