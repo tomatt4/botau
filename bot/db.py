@@ -169,19 +169,21 @@ def pode_enviar_tellonym(user_id: int) -> bool:
     return (agora - ultima) >= timedelta(hours=1)
 
 
-def add_tellonym(user_id: int, message: str):
+def add_tellonym(user_id: int, message: str) -> int:
     conn = get_conn()
     with conn:
         with conn.cursor() as cur:
             cur.execute(
                 """
                 INSERT INTO tellonym (user_id, message)
-                VALUES (%s, %s);
+                VALUES (%s, %s)
+                RETURNING id;
                 """,
                 (user_id, message)
             )
+            tellonym_id = cur.fetchone()[0]
     conn.close()
-
+    return tellonym_id
 
 def get_tellonyms(limit: int = 10):
     conn = get_conn()
