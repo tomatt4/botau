@@ -4,7 +4,7 @@ import asyncio
 from discord.ext import commands
 
 INVITE_LINK = "https://discord.gg/h3nmQEGpq6"
-CARGO_NOME = "Primeira Dama"
+CARGO_ID = 123456789012345678  # ← coloque o ID do cargo aqui
 
 async def extrair_texto_da_imagem(image_bytes, api_key):
     url = "https://api.ocr.space/parse/image"
@@ -44,7 +44,6 @@ class PrimeiraDamaView(discord.ui.View):
 
     @discord.ui.button(label="Verificar", style=discord.ButtonStyle.success, emoji="🔍")
     async def verificar(self, interaction: discord.Interaction, button: discord.ui.Button):
-        # Pega o Member do servidor, não só o User
         member = interaction.guild.get_member(interaction.user.id)
         if not member:
             await interaction.response.send_message(
@@ -53,8 +52,7 @@ class PrimeiraDamaView(discord.ui.View):
             )
             return
 
-        guild = interaction.guild
-        cargo = discord.utils.get(guild.roles, name=CARGO_NOME)
+        cargo = interaction.guild.get_role(CARGO_ID)
         if not cargo:
             await interaction.response.send_message(
                 "Cargo não encontrado no servidor.",
@@ -92,8 +90,9 @@ class PrimeiraDamaView(discord.ui.View):
             msg = await self.bot.wait_for("message", timeout=120, check=check)
             attachment = msg.attachments[0]
 
-            if not attachment.content_type or not attachment.content_type.startswith("image"):
-                await member.send("Isso não é uma imagem válida.")
+            # Aceita mais tipos de imagem
+            if not attachment.filename.lower().endswith((".png", ".jpg", ".jpeg", ".webp")):
+                await member.send("Isso não parece uma imagem válida (.png, .jpg, .jpeg, .webp).")
                 return
 
             async with aiohttp.ClientSession() as session:
@@ -106,19 +105,25 @@ class PrimeiraDamaView(discord.ui.View):
             )
 
             if not texto:
-                await member.send("Não consegui ler o texto da imagem.")
+                await member.send("Não consegui ler o texto da imagem. Certifique-se de que o print esteja legível.")
                 return
 
-            if INVITE_LINK.lower() in texto:
+            print(f"OCR retornou: {texto}")  # 🔍 debug
+
+            # Comparação mais tolerante: ignora espaços e quebras de linha
+            texto_limpo = texto.replace(" ", "").replace("\n", "")
+            link_limpo = INVITE_LINK.split("//")[1].lower()
+
+            if link_limpo in texto_limpo:
                 await member.add_roles(cargo)
                 await member.send(
                     "**Verificação aprovada!**\n"
-                    "Cargo **Primeira Dama** concedido"
+                    "Cargo **Primeira Dama** concedido 🎉"
                 )
             else:
                 await member.send(
-                    "Link do servidor não encontrado.\n"
-                    "Confere se o print tá legível"
+                    "Link do servidor não encontrado no print.\n"
+                    "Confere se está legível e tente novamente."
                 )
 
         except asyncio.TimeoutError:
