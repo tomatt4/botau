@@ -60,7 +60,6 @@ class PrimeiraDamaView(discord.ui.View):
             )
             return
 
-        # Mensagem inicial pedindo o print
         try:
             await member.send(
                 "**Verificação – Primeira Dama**\n\n"
@@ -82,18 +81,17 @@ class PrimeiraDamaView(discord.ui.View):
         # Check confiável para DM
         def check(msg):
             return (
-                msg.author.id == interaction.user.id  # compara com o User que clicou
-                and msg.guild is None                 # só DMs
+                msg.author.id == interaction.user.id
+                and msg.guild is None
                 and msg.attachments
             )
 
         try:
             msg = await self.bot.wait_for("message", timeout=120, check=check)
-            await member.send("Recebi sua imagem, processando... 🔍")  # feedback imediato
+            await member.send("Recebi sua imagem, processando... 🔍")
 
             attachment = msg.attachments[0]
 
-            # Aceita mais tipos de imagem
             if not attachment.filename.lower().endswith((".png", ".jpg", ".jpeg", ".webp")):
                 await member.send("Isso não parece uma imagem válida (.png, .jpg, .jpeg, .webp).")
                 return
@@ -105,26 +103,27 @@ class PrimeiraDamaView(discord.ui.View):
             texto = await extrair_texto_da_imagem(image_bytes, self.bot.OCR_API_KEY)
 
             if not texto:
-                await member.send("Não consegui ler o texto da imagem. Certifique-se de que o print esteja legível.")
+                await member.send("❌ Não consegui ler o texto da imagem. Certifique-se de que o print esteja legível.")
                 return
 
-            print(f"OCR retornou: {texto}")  # 🔍 debug no console
-
-            # Comparação mais tolerante: ignora espaços e quebras de linha
+            # Limpa texto para comparação
             texto_limpo = texto.replace(" ", "").replace("\n", "")
             link_limpo = INVITE_LINK.split("//")[1].lower()
 
+            # Mostra para o usuário o que o OCR leu
+            await member.send(f"📄 OCR detectou o seguinte texto:\n```\n{texto}\n```")
+
             if link_limpo in texto_limpo:
                 await member.add_roles(cargo)
-                await member.send("**Verificação aprovada!** 🎉 Cargo concedido!")
+                await member.send("✅ **Verificação aprovada!** Cargo **Primeira Dama** concedido 🎉")
             else:
                 await member.send(
-                    "Link do servidor não encontrado no print.\n"
-                    "Confere se está legível e tente novamente."
+                    "❌ Link do servidor não encontrado no print.\n"
+                    "Confere se o link está legível e tente novamente."
                 )
 
         except asyncio.TimeoutError:
-            await member.send("Tempo esgotado. Clique no botão novamente.")
+            await member.send("⏱️ Tempo esgotado. Clique no botão novamente.")
 
 
 class PrimeiraDama(commands.Cog):
