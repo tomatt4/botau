@@ -9,7 +9,6 @@ from keepalive import keep_alive
 from db import init_db
 
 TOKEN = os.getenv("DISCORD_TOKEN")
-OCR_API_KEY = os.getenv("OCR_SPACE_API_KEY")
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 load_dotenv()
@@ -25,6 +24,8 @@ class RizeBot(commands.Bot):
             activity=discord.Game(name="ashjufgweis | /help")
         )
 
+        # 🔑 OCR API KEY (acessível em todos os cogs)
+        self.OCR_API_KEY = os.getenv("OCR_SPACE_API_KEY")
 
     async def setup_hook(self):
         # 📦 Carregar cogs
