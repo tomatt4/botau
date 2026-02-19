@@ -7,7 +7,7 @@ class Welcome(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
-        CHANNEL_ID = 1410053387558322297  # coloca o ID do canal aqui
+        CHANNEL_ID = 1454971586758180907  # coloca o ID do canal aqui
 
         channel = member.guild.get_channel(CHANNEL_ID)
         if not channel:
