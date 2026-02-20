@@ -16,7 +16,7 @@ def gerar_imagem_tellonym(numero: int, mensagem: str):
     # 🔝 Título
     draw.text(
         (largura // 2, 40),
-        f"Mensagem Anônima #{numero}",
+        f"Tellonym #{numero}",
         fill="black",
         anchor="mm",
         font=fonte_titulo
