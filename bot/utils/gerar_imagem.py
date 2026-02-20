@@ -30,7 +30,7 @@ def gerar_imagem_tellonym(numero: int, mensagem: str):
         draw.text(
             (largura // 2, y),
             linha,
-            fill="white",
+            fill="black",
             anchor="mm",
             font=fonte_texto
         )
@@ -41,7 +41,7 @@ def gerar_imagem_tellonym(numero: int, mensagem: str):
     draw.text(
         (largura // 2, altura - 30),
         data,
-        fill="white",
+        fill="black",
         anchor="mm",
         font=fonte_data
     )
