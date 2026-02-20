@@ -5,7 +5,8 @@ import asyncio
 
 STAFF_ROLE_ID = 1447395230646140999  # ID do cargo de staff
 
-class avaliar(commands.Cog):
+
+class StaffEvaluation(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -19,83 +20,125 @@ class avaliar(commands.Cog):
             color=discord.Color.blue()
         )
 
-        class AvaliarView(discord.ui.View):
-            @discord.ui.button(label="Avaliar Staff", style=discord.ButtonStyle.green)
-            async def avaliar_button(self, interaction: discord.Interaction, button: discord.ui.Button):
-                guild = interaction.guild
-                staff_membros = [m for m in guild.members if any(r.id == STAFF_ROLE_ID for r in m.roles)]
+        view = AvaliarView(self.bot)
+        await ctx.send(embed=embed, view=view)
 
-                if not staff_membros:
-                    await interaction.response.send_message(
-                        "Não encontrei nenhum membro com o cargo de staff.", ephemeral=True
-                    )
-                    return
 
-                # Criando a view com Select dinâmico
-                class StaffSelect(discord.ui.View):
-                    def __init__(self, staff_membros):
-                        super().__init__()
-                        options = [
-                            discord.SelectOption(label=m.display_name, value=str(m.id))
-                            for m in staff_membros
-                        ]
-                        select = discord.ui.Select(
-                            placeholder="Escolha o staff que deseja avaliar",
-                            min_values=1,
-                            max_values=1,
-                            options=options
-                        )
-                        select.callback = self.select_callback
-                        self.add_item(select)
+class AvaliarView(discord.ui.View):
+    def __init__(self, bot):
+        super().__init__(timeout=None)
+        self.bot = bot
 
-                    async def select_callback(self, select_interaction: discord.Interaction):
-                        staff_id = int(select_interaction.data["values"][0])
-                        staff_user = guild.get_member(staff_id)
+    @discord.ui.button(label="Avaliar Staff", style=discord.ButtonStyle.green)
+    async def avaliar_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        guild = interaction.guild
 
-                        if staff_user is None:
-                            await select_interaction.response.send_message(
-                                "Não consegui encontrar esse usuário.", ephemeral=True
-                            )
-                            return
+        staff_membros = [
+            m for m in guild.members
+            if any(r.id == STAFF_ROLE_ID for r in m.roles)
+        ]
 
-                        # envia DM para o usuário pedindo avaliação
-                        try:
-                            await select_interaction.user.send(
-                                f"Você escolheu avaliar **{staff_user.display_name}**.\n"
-                                "Por favor, envie sua avaliação aqui. Depois de enviar, ela será encaminhada para o staff."
-                            )
+        if not staff_membros:
+            await interaction.response.send_message(
+                "Não encontrei nenhum membro com o cargo de staff.",
+                ephemeral=True
+            )
+            return
 
-                            await select_interaction.response.send_message(
-                                "Te enviei uma DM para enviar sua avaliação!", ephemeral=True
-                            )
+        view = StaffSelect(self.bot, guild, staff_membros)
+        await interaction.response.send_message(
+            "Escolha o staff abaixo:",
+            view=view,
+            ephemeral=True
+        )
 
-                            def check(m):
-                                return m.author == select_interaction.user and isinstance(m.channel, discord.DMChannel)
 
-                            msg = await self.bot.wait_for("message", check=check, timeout=300)  # 5 min
+class StaffSelect(discord.ui.View):
+    def __init__(self, bot, guild, staff_membros):
+        super().__init__(timeout=180)
+        self.bot = bot
+        self.guild = guild
 
-                            try:
-                                await staff_user.send(
-                                    f"Você recebeu uma avaliação de {select_interaction.user.mention}:\n\n{msg.content}"
-                                )
-                                await select_interaction.user.send("Sua avaliação foi enviada com sucesso ✅")
-                            except discord.Forbidden:
-                                await select_interaction.user.send(
-                                    "Não consegui enviar a avaliação para o staff. Ele(a) pode estar com DMs bloqueadas."
-                                )
+        options = [
+            discord.SelectOption(
+                label=m.display_name,
+                value=str(m.id)
+            )
+            for m in staff_membros
+        ]
 
-                        except discord.Forbidden:
-                            await select_interaction.response.send_message(
-                                "Não consegui te enviar uma DM. Verifique suas configurações de privacidade.", ephemeral=True
-                            )
-                        except asyncio.TimeoutError:
-                            await select_interaction.user.send(
-                                "Você não respondeu a tempo. Tente novamente clicando no botão."
-                            )
+        select = discord.ui.Select(
+            placeholder="Escolha o staff que deseja avaliar",
+            min_values=1,
+            max_values=1,
+            options=options
+        )
 
-                await interaction.response.send_message("Escolha um staff abaixo:", view=StaffSelect(staff_membros), ephemeral=True)
+        select.callback = self.select_callback
+        self.add_item(select)
 
-        await ctx.send(embed=embed, view=AvaliarView())
+    async def select_callback(self, interaction: discord.Interaction):
+        staff_id = int(interaction.data["values"][0])
+        staff_user = self.guild.get_member(staff_id)
+
+        if staff_user is None:
+            await interaction.response.send_message(
+                "Não consegui encontrar esse usuário.",
+                ephemeral=True
+            )
+            return
+
+        try:
+            await interaction.user.send(
+                f"Você escolheu avaliar **{staff_user.display_name}**.\n"
+                "Envie sua avaliação aqui. Você tem 5 minutos."
+            )
+
+            await interaction.response.send_message(
+                "Te enviei uma DM para enviar sua avaliação!",
+                ephemeral=True
+            )
+
+        except discord.Forbidden:
+            await interaction.response.send_message(
+                "Não consegui te enviar DM. Verifique suas configurações.",
+                ephemeral=True
+            )
+            return
+
+        def check(m):
+            return (
+                m.author == interaction.user
+                and isinstance(m.channel, discord.DMChannel)
+            )
+
+        try:
+            msg = await self.bot.wait_for(
+                "message",
+                check=check,
+                timeout=300
+            )
+        except asyncio.TimeoutError:
+            await interaction.user.send(
+                "Tempo esgotado. Tente novamente clicando no botão."
+            )
+            return
+
+        try:
+            await staff_user.send(
+                f"**Nova avaliação recebida**\n\n"
+                f"De: {interaction.user.mention}\n"
+                f"Avaliação:\n{msg.content}"
+            )
+            await interaction.user.send(
+                "Sua avaliação foi enviada com sucesso ✅"
+            )
+
+        except discord.Forbidden:
+            await interaction.user.send(
+                "Não consegui enviar a avaliação ao staff (DMs fechadas)."
+            )
+
 
 async def setup(bot):
-   await bot.add_cog(avaliar(bot))
+    await bot.add_cog(StaffEvaluation(bot))
