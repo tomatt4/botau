@@ -32,7 +32,10 @@ def gerar_imagem_tellonym(numero: int, mensagem: str):
     # 💬 CENTRO - Mensagem
     # Quebra linhas e calcula altura total
     linhas = textwrap.wrap(mensagem, width=40)
-    linha_altura = fonte_texto.getsize("A")[1]
+    # Com textsize:
+    linha_altura = draw.textsize("A", font=fonte_texto)[1]
+    # Ou, de forma mais moderna com textbbox:
+    linha_altura = draw.textbbox((0,0), "A", font=fonte_texto)[3]  # altura = bottom - top
     bloco_altura = len(linhas) * (linha_altura + 6)  # 6px espaçamento
 
     y = (altura - bloco_altura) // 2  # centraliza verticalmente
