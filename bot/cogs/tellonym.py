@@ -7,7 +7,7 @@ from db import add_tellonym, get_conn
 
 # :wrench: CONFIGURAÇÕES
 CANAL_TELLONYM_ID = 1474254658662039713  # canal público do tellonym
-STAFF_LOG_ID = 1406713073720496179       # canal de logs da staff
+STAFF_LOG_ID = 1474263449818366114      # canal de logs da staff
 COOLDOWN_MINUTOS = 60
 
 
