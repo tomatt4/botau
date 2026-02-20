@@ -35,7 +35,6 @@ def gerar_imagem_tellonym(numero: int, mensagem: str):
         x = (largura - largura_texto) // 2
         draw.text((x, y), linha, fill="black", font=fonte_texto)
         y += linha_altura + 6
-    )
 
     caminho = f"/tmp/tellonym_{uuid.uuid4().hex}.png"
     img.save(caminho)
