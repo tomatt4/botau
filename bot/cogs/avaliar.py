@@ -97,5 +97,5 @@ class avaliar(commands.Cog):
 
         await ctx.send(embed=embed, view=AvaliarView())
 
-def setup(bot):
-    bot.add_cog(avaliar(bot))
+async def setup(bot):
+   await bot.add_cog(avaliar(bot))
