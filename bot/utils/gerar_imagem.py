@@ -11,9 +11,9 @@ def gerar_imagem_tellonym(numero: int, mensagem: str):
 
     # Carregar fontes
     try:
-        fonte_titulo = ImageFont.truetype("arial.ttf", 36)  # título maior
-        fonte_texto = ImageFont.truetype("arial.ttf", 28)   # centro/mensagem
-        fonte_data = ImageFont.truetype("arial.ttf", 20)    # rodapé
+        fonte_titulo = ImageFont.truetype("arial.ttf", 100)  # título maior
+        fonte_texto = ImageFont.truetype("arial.ttf", 100)   # centro/mensagem
+        fonte_data = ImageFont.truetype("arial.ttf", 80)    # rodapé
     except:
         # fallback se não encontrar a fonte
         fonte_titulo = ImageFont.load_default()
