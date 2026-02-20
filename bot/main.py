@@ -49,6 +49,7 @@ class RizeBot(commands.Bot):
         await self.load_extension("cogs.cargo")
         await self.load_extension("cogs.primeiradama")
         await self.load_extension("cogs.tellonym")
+        await self.load_extension("cogs.avaliar")
         print("Lumi: Cogs carregados")
 
         # 🔁 Sync dos slash
