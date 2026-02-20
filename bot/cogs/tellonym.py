@@ -54,7 +54,6 @@ class TellonymModal(discord.ui.Modal, title="Enviar mensagem anônima"):
         caminho_img = gerar_imagem_tellonym(
             numero=tellonym_id,
             mensagem=self.mensagem.value,
-            data=datetime.utcnow()
         )
 
         canal = interaction.guild.get_channel(CANAL_TELLONYM_ID)
