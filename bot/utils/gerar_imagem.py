@@ -7,10 +7,18 @@ def gerar_imagem_tellonym(numero: int, mensagem: str):
     img = Image.open("bot/asset/tellonym_base.png").convert("RGBA")
     draw = ImageDraw.Draw(img)
 
+    from PIL import ImageFont
+
+try:
+    fonte_titulo = ImageFont.truetype("arial.ttf", 30)  # título maior
+    fonte_texto = ImageFont.truetype("arial.ttf", 24)   # centro/mensagem
+    fonte_data = ImageFont.truetype("arial.ttf", 18)    # rodapé
+except:
+    # fallback se não encontrar a fonte
     fonte_titulo = ImageFont.load_default()
     fonte_texto = ImageFont.load_default()
     fonte_data = ImageFont.load_default()
-
+    
     largura, altura = img.size
 
     # 🔝 TOPO
