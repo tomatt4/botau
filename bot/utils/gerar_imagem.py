@@ -7,17 +7,16 @@ def gerar_imagem_tellonym(numero: int, mensagem: str):
     img = Image.open("bot/asset/tellonym_base.png").convert("RGBA")
     draw = ImageDraw.Draw(img)
 
-    from PIL import ImageFont
-
-try:
-    fonte_titulo = ImageFont.truetype("arial.ttf", 30)  # título maior
-    fonte_texto = ImageFont.truetype("arial.ttf", 24)   # centro/mensagem
-    fonte_data = ImageFont.truetype("arial.ttf", 18)    # rodapé
-except:
-    # fallback se não encontrar a fonte
-    fonte_titulo = ImageFont.load_default()
-    fonte_texto = ImageFont.load_default()
-    fonte_data = ImageFont.load_default()
+    # Carregar fontes com tamanho definido
+    try:
+        fonte_titulo = ImageFont.truetype("arial.ttf", 30)  # título maior
+        fonte_texto = ImageFont.truetype("arial.ttf", 24)   # centro/mensagem
+        fonte_data = ImageFont.truetype("arial.ttf", 18)    # rodapé
+    except:
+        # fallback se não encontrar a fonte
+        fonte_titulo = ImageFont.load_default()
+        fonte_texto = ImageFont.load_default()
+        fonte_data = ImageFont.load_default()
     
     largura, altura = img.size
 
@@ -32,7 +31,7 @@ except:
 
     # 💬 CENTRO
     linhas = textwrap.wrap(mensagem, width=40)
-    y = altura // 2 - (len(linhas) * 10)
+    y = altura // 2 - (len(linhas) * 12)  # ajusta vertical melhor
 
     for linha in linhas:
         draw.text(
@@ -42,7 +41,7 @@ except:
             anchor="mm",
             font=fonte_texto
         )
-        y += 20
+        y += 28  # aumenta espaçamento pra texto maior
 
     # 📅 RODAPÉ
     data = datetime.now().strftime("%d/%m/%Y • %H:%M")
