@@ -17,7 +17,7 @@ class TellonymModal(discord.ui.Modal, title="Enviar mensagem anônima"):
         label="Sua mensagem",
         style=discord.TextStyle.paragraph,
         max_length=104,
-        placeholder="Escreva aqui anonimamente para alguém..."
+        placeholder="Escreva aqui anonimamente."
     )
 
     async def on_submit(self, interaction: discord.Interaction):
@@ -62,7 +62,7 @@ class TellonymModal(discord.ui.Modal, title="Enviar mensagem anônima"):
         file = discord.File(caminho_img, filename="tellonym.png")
         embed_publico = discord.Embed(
             title="Novo Tellonym Anônimo",
-            description="Alguém enviou uma mensagem anônima para você.",
+            description="Conteúdo inaproriado abaixo? **Denuncie imediatamente.**",
             color=0xFFFFFF,
             timestamp=datetime.utcnow()
         )
@@ -117,10 +117,9 @@ class Tellonym(commands.Cog):
                 "Um Tellonym é uma mensagem anônima enviada por alguém do servidor. "
                 f"As mensagens aparecem no canal <#{CANAL_TELLONYM_ID}> "
                 "como uma imagem estilizada, sem mostrar quem enviou. "
-                "O bot também envia um log para a staff com o autor da mensagem. "
                 "Você pode enviar mensagens anonimamente clicando no botão abaixo."
             ),
-            color=discord.Color.blurple()
+            color=0xFFFFFF
         )
 
         await ctx.send(embed=embed, view=TellonymView())
