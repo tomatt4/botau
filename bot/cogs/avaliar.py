@@ -126,12 +126,11 @@ class StaffSelect(discord.ui.View):
 
         try:
             await staff_user.send(
-                f"**Nova avaliação recebida**\n\n"
-                f"De: {interaction.user.mention}\n"
-                f"Avaliação:\n{msg.content}"
+                f"**Nova avaliação recebida!**\n\n"
+                f"{interaction.user.mention} deu a seguinte avaliação para você: **{msg.content}**"
             )
             await interaction.user.send(
-                "Sua avaliação foi enviada com sucesso ✅"
+                "Sua avaliação foi enviada com sucesso."
             )
 
         except discord.Forbidden:
