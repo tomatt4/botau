@@ -42,7 +42,7 @@ class TellonymModal(discord.ui.Modal, title="Enviar mensagem anônima"):
                 ultima_data = ultima[0]
                 if datetime.utcnow() - ultima_data < timedelta(minutes=COOLDOWN_MINUTOS):
                     await interaction.response.send_message(
-                        "⏳ Você só pode enviar **1 tellonym por hora**.",
+                        "Você só pode enviar **1 tellonym por hora**.",
                         ephemeral=True
                     )
                     return
@@ -59,9 +59,9 @@ class TellonymModal(discord.ui.Modal, title="Enviar mensagem anônima"):
         canal = interaction.guild.get_channel(CANAL_TELLONYM_ID)
 
         embed = discord.Embed(
-            title="📩 Novo Tellonym Anônimo",
-            color=discord.Color.purple(),
-            timestamp=datetime.utcnow()
+            title="Novo Tellonym Anônimo",
+            color=0xFFFFFF,
+            timestamp=None
         )
 
         embed.set_image(url="attachment://tellonym.png")
@@ -70,7 +70,7 @@ class TellonymModal(discord.ui.Modal, title="Enviar mensagem anônima"):
         await canal.send(embed=embed, file=file)
 
         await interaction.response.send_message(
-            "✅ Sua mensagem foi enviada anonimamente!",
+            "Sua mensagem foi enviada anonimamente.",
             ephemeral=True
         )
 
