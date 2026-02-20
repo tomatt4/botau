@@ -16,8 +16,8 @@ class StaffEvaluation(commands.Cog):
 
         embed = discord.Embed(
             title="Avaliação de Staff",
-            description="Clique no botão abaixo para avaliar um membro da staff.",
-            color=discord.Color.blue()
+            description="Clique no botão abaixo para avaliar um membro da staff!",
+            color=0xFFFFFF
         )
 
         view = AvaliarView(self.bot)
