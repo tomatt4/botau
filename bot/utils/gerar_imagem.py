@@ -4,7 +4,7 @@ import textwrap
 import uuid
 
 def gerar_imagem_tellonym(numero: int, mensagem: str):
-    img = Image.open("assets/tellonym_base.png").convert("RGBA")
+    img = Image.open("bot/asset/tellonym_base.png").convert("RGBA")
     draw = ImageDraw.Draw(img)
 
     fonte_titulo = ImageFont.load_default()
