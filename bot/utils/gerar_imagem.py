@@ -23,7 +23,7 @@ def gerar_imagem_tellonym(numero: int, mensagem: str):
     )
 
     # 💬 Mensagem
-    linhas = textwrap.wrap(mensagem, width=40)
+    linhas = textwrap.wrap(mensagem, width=26)
     bbox = draw.textbbox((0, 0), "A", font=fonte_texto)
     linha_altura = bbox[3] - bbox[1]
     bloco_altura = len(linhas) * (linha_altura + 6)
