@@ -16,7 +16,7 @@ def gerar_imagem_tellonym(numero: int, mensagem: str):
     # 🔝 Título
     draw.text(
         (largura // 2, 40),
-        f"Tellonym #{numero}",
+        f"Novo Tellonym! #{numero}",
         fill="black",
         anchor="mm",
         font=fonte_titulo
@@ -35,15 +35,6 @@ def gerar_imagem_tellonym(numero: int, mensagem: str):
         x = (largura - largura_texto) // 2
         draw.text((x, y), linha, fill="black", font=fonte_texto)
         y += linha_altura + 6
-
-    # 📅 Rodapé
-    data = datetime.now().strftime("%d/%m/%Y • %H:%M")
-    draw.text(
-        (largura // 2, altura - 40),
-        data,
-        fill="black",
-        anchor="mm",
-        font=fonte_data
     )
 
     caminho = f"/tmp/tellonym_{uuid.uuid4().hex}.png"
