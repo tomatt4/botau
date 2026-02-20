@@ -5,8 +5,9 @@ from datetime import datetime, timedelta
 from utils.gerar_imagem import gerar_imagem_tellonym
 from db import add_tellonym, get_conn
 
-# 🔧 CONFIGURAÇÕES
-CANAL_TELLONYM_ID = 1474178044586627317
+# :wrench: CONFIGURAÇÕES
+CANAL_TELLONYM_ID = 1474254658662039713  # canal público do tellonym
+STAFF_LOG_ID = 1406713073720496179       # canal de logs da staff
 COOLDOWN_MINUTOS = 60
 
 
@@ -16,13 +17,13 @@ class TellonymModal(discord.ui.Modal, title="Enviar mensagem anônima"):
         label="Sua mensagem",
         style=discord.TextStyle.paragraph,
         max_length=104,
-        placeholder="Escreva aqui anonimamente..."
+        placeholder="Escreva aqui anonimamente para alguém..."
     )
 
     async def on_submit(self, interaction: discord.Interaction):
         membro = interaction.user
 
-        # 👑 Admin sem cooldown
+        # :crown: Administradores não têm cooldown
         if not membro.guild_permissions.administrator:
             conn = get_conn()
             with conn.cursor() as cur:
@@ -47,30 +48,40 @@ class TellonymModal(discord.ui.Modal, title="Enviar mensagem anônima"):
                     )
                     return
 
-        # 💾 Salva no banco
+        # :floppy_disk: Salva no banco de dados e pega o ID
         tellonym_id = add_tellonym(membro.id, self.mensagem.value)
 
-        # 🖼️ Gera imagem
+        # :frame_photo: Gera a imagem do tellonym
         caminho_img = gerar_imagem_tellonym(
             numero=tellonym_id,
             mensagem=self.mensagem.value,
         )
 
-        canal = interaction.guild.get_channel(CANAL_TELLONYM_ID)
-
-        embed = discord.Embed(
-            title="Novo Tellonym Anônimo",
-            color=0xFFFFFF,
-            timestamp=None
-        )
-
-        embed.set_image(url="attachment://tellonym.png")
-
+        # :small_blue_diamond: Envia no canal público anonimamente
+        canal_publico = interaction.guild.get_channel(CANAL_TELLONYM_ID)
         file = discord.File(caminho_img, filename="tellonym.png")
-        await canal.send(embed=embed, file=file)
+        embed_publico = discord.Embed(
+            title="Novo Tellonym Anônimo",
+            description="Alguém enviou uma mensagem anônima para você.",
+            color=0xFFFFFF,
+            timestamp=datetime.utcnow()
+        )
+        embed_publico.set_image(url="attachment://tellonym.png")
+        await canal_publico.send(embed=embed_publico, file=file)
 
+        # :small_blue_diamond: Envia log para staff mencionando quem enviou
+        canal_log = interaction.guild.get_channel(STAFF_LOG_ID)
+        embed_log = discord.Embed(
+            title="Log de Tellonym",
+            description=f"O membro {membro.mention} enviou um tellonym: `{self.mensagem.value}`",
+            color=discord.Color.orange(),
+            timestamp=datetime.utcnow()
+        )
+        await canal_log.send(embed=embed_log)
+
+        # Confirmação para quem enviou
         await interaction.response.send_message(
-            "Sua mensagem foi enviada anonimamente.",
+            "Sua mensagem foi enviada anonimamente!",
             ephemeral=True
         )
 
@@ -81,7 +92,7 @@ class TellonymView(discord.ui.View):
         super().__init__(timeout=None)
 
     @discord.ui.button(
-        label="📩 Enviar mensagem anônima",
+        label="Enviar mensagem anônima",
         style=discord.ButtonStyle.primary,
         custom_id="tellonym_button"
     )
@@ -100,12 +111,14 @@ class Tellonym(commands.Cog):
         """Envia o painel do Tellonym"""
 
         embed = discord.Embed(
-            title="💬 Tellonym do Servidor",
+            title="Tellonym do Servidor",
             description=(
-                "Envie mensagens **totalmente anônimas** 📭\n\n"
-                "• 1 mensagem por hora\n"
-                "• Administradores não possuem limite\n"
-                "• Respeite as regras do servidor"
+                "**O que é um Tellonym?**\n\n"
+                "Um Tellonym é uma mensagem anônima enviada por alguém do servidor. "
+                f"As mensagens aparecem no canal <#{CANAL_TELLONYM_ID}> "
+                "como uma imagem estilizada, sem mostrar quem enviou. "
+                "O bot também envia um log para a staff com o autor da mensagem. "
+                "Você pode enviar mensagens anonimamente clicando no botão abaixo."
             ),
             color=discord.Color.blurple()
         )
@@ -113,5 +126,6 @@ class Tellonym(commands.Cog):
         await ctx.send(embed=embed, view=TellonymView())
 
 
+# ───────────── SETUP ─────────────
 async def setup(bot):
     await bot.add_cog(Tellonym(bot))
