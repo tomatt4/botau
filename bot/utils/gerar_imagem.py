@@ -9,9 +9,9 @@ def gerar_imagem_tellonym(numero: int, mensagem: str):
     largura, altura = img.size
 
     # Carrega a fonte do projeto (Roboto renomeada)
-    fonte_titulo = ImageFont.truetype("bot/asset/fonts/font.ttf", 36)
-    fonte_texto = ImageFont.truetype("bot/asset/fonts/font.ttf", 28)
-    fonte_data   = ImageFont.truetype("bot/asset/fonts/font.ttf", 20)
+    fonte_titulo = ImageFont.truetype("bot/asset/font.ttf", 36)
+    fonte_texto = ImageFont.truetype("bot/asset/font.ttf", 28)
+    fonte_data   = ImageFont.truetype("bot/asset/font.ttf", 20)
 
     # 🔝 Título
     draw.text(
