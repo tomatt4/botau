@@ -15,7 +15,7 @@ class TellonymModal(discord.ui.Modal, title="Enviar mensagem anônima"):
     mensagem = discord.ui.TextInput(
         label="Sua mensagem",
         style=discord.TextStyle.paragraph,
-        max_length=500,
+        max_length=104,
         placeholder="Escreva aqui anonimamente..."
     )
 
