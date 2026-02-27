@@ -31,7 +31,7 @@ class DualGuildBot(commands.Bot):
             command_prefix=",",
             intents=intents,
             help_command=None,
-            activity=discord.Game(name="online e estável 😎")
+            activity=discord.Game(name="COÉ DISCORD FUI BANIDO DA API")
         )
 
     async def setup_hook(self):
@@ -39,17 +39,12 @@ class DualGuildBot(commands.Bot):
         # 📦 LOAD SEGURO DOS COGS
         # ========================
         cogs = [
-            "cogs.tickets",
             "cogs.welcome",
-            "cogs.primeiradama",
-            "cogs.avaliar",
             "cogs.random_number",
-            "cogs.sair",
-            "cogs.tellonym",
             "cogs.utils",
-            "cogs.afk",
             "cogs.moderation",
-            "cogs.mensagem"
+            "cogs.mensagem",
+            "cogs.embeds",
             # adiciona aqui só os essenciais
         ]
 
