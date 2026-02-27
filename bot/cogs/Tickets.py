@@ -3,7 +3,6 @@ from discord.ext import commands
 from datetime import timedelta
 from db import get_conn
 
-
 # =========================
 # VIEW DO TICKET (PERSISTENTE)
 # =========================
@@ -104,14 +103,14 @@ class TicketView(discord.ui.View):
             f"Um administrador irá te atender em breve."
         )
 
-
 # =========================
-# COG ADMIN
+# COG TICKETS (ADMIN + ASSUMIR)
 # =========================
-class Admin(commands.Cog):
+class Tickets(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    # -------- PAINEL --------
     @commands.hybrid_command(
         name="painel",
         description="Criar painel de tickets",
@@ -136,6 +135,41 @@ class Admin(commands.Cog):
         else:
             await ctx.send(embed=embed, view=view)
 
+    # -------- ASSUMIR --------
+    @commands.hybrid_command(
+        name="assumir",
+        description="Assumir o ticket atual"
+    )
+    @commands.has_permissions(administrator=True)
+    async def assumir(self, ctx: commands.Context):
+        conn = get_conn()
+        cur = conn.cursor()
+
+        cur.execute(
+            "SELECT id FROM tickets WHERE channel_id = %s",
+            (str(ctx.channel.id),)
+        )
+        result = cur.fetchone()
+
+        if not result:
+            msg = "<:Warning:1457445578593009734> | Amigão... bebeu foi? Esse canal não é um ticket."
+            if ctx.interaction:
+                await ctx.interaction.response.send_message(msg, ephemeral=True)
+            else:
+                await ctx.send(msg)
+            cur.close()
+            conn.close()
+            return
+
+        cur.close()
+        conn.close()
+
+        if ctx.interaction:
+            await ctx.interaction.response.send_message("Ticket assumido!")
+        else:
+            await ctx.send("Ticket assumido!")
+
+    # -------- FECHAR --------
     @commands.hybrid_command(
         name="fechar",
         description="Fechar o ticket atual",
@@ -182,6 +216,8 @@ class Admin(commands.Cog):
         )
         await ctx.channel.delete(reason=f"Ticket fechado por {ctx.author}")
 
-
+# =========================
+# SETUP
+# =========================
 async def setup(bot):
-    await bot.add_cog(Admin(bot))
+    await bot.add_cog(Tickets(bot))
