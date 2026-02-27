@@ -1,34 +1,45 @@
 import discord
 import os
-import sys
 from discord.ext import commands
 from dotenv import load_dotenv
-from keepalive import keep_alive
 
-# 👇 IMPORT DO BANCO
-from db import init_db
-
-TOKEN = os.getenv("DISCORD_TOKEN")
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# ========================
+# 🔐 ENV
+# ========================
 load_dotenv()
+TOKEN = os.getenv("DISCORD_TOKEN")
+TEST_GUILD_ID = int(os.getenv("TEST_GUILD_ID"))
+PROD_GUILD_ID = int(os.getenv("PROD_GUILD_ID"))
 
+if not TOKEN:
+    raise RuntimeError("TOKEN não encontrado")
+    
+# ========================
+# 🌐 KEEP ALIVE
+# ========================
+keep_alive()
 
-class RizeBot(commands.Bot):
+# ========================
+# 🧠 INTENTS
+# ========================
+intents = discord.Intents.default()
+intents.message_content = True
+intents.members = True
+
+# ========================
+# 🤖 BOT
+# ========================
+class DualGuildBot(commands.Bot):
     def __init__(self):
-        intents = discord.Intents.all()
         super().__init__(
             command_prefix=",",
             intents=intents,
             help_command=None,
-            activity=discord.Game(name="ashjufgweis | /help")
+            activity=discord.Game(name="TOMEI BAN DA API | /help")
         )
 
-        # 🔑 OCR API KEY (acessível em todos os cogs)
-        self.OCR_API_KEY = os.getenv("OCR_SPACE_API_KEY")
-
     async def setup_hook(self):
-        # 📦 Carregar cogs
+        # 🔹 Cogs essenciais
         await self.load_extension("cogs.moderation")
         await self.load_extension("cogs.admin")
         await self.load_extension("cogs.random_number")
@@ -50,24 +61,22 @@ class RizeBot(commands.Bot):
         await self.load_extension("cogs.primeiradama")
         await self.load_extension("cogs.tellonym")
         await self.load_extension("cogs.avaliar")
-        print("Lumi: Cogs carregados")
 
-        # 🔁 Sync dos slash
-        await self.tree.sync()
-        print("Lumi: Comandos sincronizados brother")
+        # 🔁 Slash commands
+        # TESTE → sempre
+        await self.tree.sync(guild=discord.Object(id=TEST_GUILD_ID))
 
-        # 🎫 View persistente do painel (IMPORTANTE)
-        from cogs.admin import TicketView
-        self.add_view(TicketView())
+        # PRODUÇÃO → só se quiser (comentado por padrão)
+        # await self.tree.sync(guild=discord.Object(id=PROD_GUILD_ID))
+
+        print("Slash sync OK (teste ativo, prod seguro)")
 
     async def on_ready(self):
-        # 🧱 CRIA AS TABELAS AUTOMATICAMENTE
-        init_db()
+        print(f"Conectado como {self.user}")
+        print("Bot pronto nos dois servidores 🚀")
 
-        print(f"Conectado: {self.user} (ID: {self.user.id})")
-        print("------")
-
-
-keep_alive()
-bot = RizeBot()
+# ========================
+# 🚀 START
+# ========================
+bot = DualGuildBot()
 bot.run(TOKEN)
