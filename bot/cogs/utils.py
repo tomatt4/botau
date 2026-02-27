@@ -1,113 +1,217 @@
 import discord
 from discord.ext import commands
-from db import get_stats, add_mensagem, add_tempo_call, garantir_usuario_stats
+from discord import app_commands
+from datetime import datetime, timedelta
+import random
+import asyncio
 
+from db import (
+    get_conn,
+    add_tellonym,
+    get_stats
+)
+from utils.gerar_imagem import gerar_imagem_tellonym
+
+# =========================
+# CONFIGS
+# =========================
+CANAL_TELLONYM_ID = 1474254658662039713
+STAFF_LOG_ID = 1474263449818366114
+COOLDOWN_MINUTOS = 60
+STAFF_ROLE_ID = 1447395230646140999
+EXCLUSIVE_ROLE_ID = 1447395230646140999
+
+# =========================
+# VIEW PRIMEIRA DAMA
+# =========================
+class PrimeiraDamaView(discord.ui.View):
+    def __init__(self, bot):
+        super().__init__(timeout=None)
+        self.bot = bot
+
+    @discord.ui.button(label="Resgatar", style=discord.ButtonStyle.success)
+    async def resgatar(self, interaction: discord.Interaction, _):
+        guild = interaction.guild
+        user = interaction.user
+
+        category = discord.utils.get(guild.categories, name="𝐈𝐧𝐟𝐨𝐫𝐦𝐚çõ𝐞𝐬")
+        if not category:
+            category = await guild.create_category("𝐈𝐧𝐟𝐨𝐫𝐦𝐚çõ𝐞𝐬")
+
+        overwrites = {
+            guild.default_role: discord.PermissionOverwrite(read_messages=False),
+            user: discord.PermissionOverwrite(read_messages=True),
+            guild.me: discord.PermissionOverwrite(read_messages=True),
+        }
+
+        for role in guild.roles:
+            if role.permissions.administrator:
+                overwrites[role] = discord.PermissionOverwrite(read_messages=True)
+
+        channel = await guild.create_text_channel(
+            f"primeira-dama-{user.name}",
+            category=category,
+            overwrites=overwrites
+        )
+
+        await interaction.response.send_message(
+            f"Ticket criado: {channel.mention}",
+            ephemeral=True
+        )
+
+# =========================
+# TELLONYM
+# =========================
+class TellonymModal(discord.ui.Modal, title="Enviar mensagem anônima"):
+    mensagem = discord.ui.TextInput(
+        label="Mensagem",
+        style=discord.TextStyle.paragraph,
+        max_length=104
+    )
+
+    async def on_submit(self, interaction: discord.Interaction):
+        membro = interaction.user
+
+        if not membro.guild_permissions.administrator:
+            conn = get_conn()
+            cur = conn.cursor()
+            cur.execute(
+                "SELECT created_at FROM tellonym WHERE user_id=%s ORDER BY created_at DESC LIMIT 1",
+                (membro.id,)
+            )
+            ultima = cur.fetchone()
+            cur.close()
+            conn.close()
+
+            if ultima and datetime.utcnow() - ultima[0] < timedelta(minutes=COOLDOWN_MINUTOS):
+                await interaction.response.send_message(
+                    "Você só pode enviar **1 tellonym por hora**.",
+                    ephemeral=True
+                )
+                return
+
+        tellonym_id = add_tellonym(membro.id, self.mensagem.value)
+        img = gerar_imagem_tellonym(tellonym_id, self.mensagem.value)
+
+        canal = interaction.guild.get_channel(CANAL_TELLONYM_ID)
+        file = discord.File(img, filename="tellonym.png")
+
+        embed = discord.Embed(
+            title="Novo Tellonym Anônimo",
+            color=0xFFFFFF,
+            timestamp=datetime.utcnow()
+        )
+        embed.set_image(url="attachment://tellonym.png")
+
+        await canal.send(embed=embed, file=file)
+        await interaction.response.send_message(
+            "Mensagem enviada anonimamente!",
+            ephemeral=True
+        )
+
+class TellonymView(discord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=None)
+
+    @discord.ui.button(label="Enviar mensagem anônima", style=discord.ButtonStyle.primary)
+    async def enviar(self, interaction: discord.Interaction, _):
+        await interaction.response.send_modal(TellonymModal())
+
+# =========================
+# COG UTILS
+# =========================
 class Utils(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.afk_users = {}
 
-    # /limpar
-    @commands.hybrid_command(name="limpar", description="Limpa mensagens do canal")
-    @commands.has_permissions(manage_messages=True)
-    async def limpar(self, ctx: commands.Context, quantidade: int):
-        if quantidade > 3000:
-            await ctx.send("O máximo é **3000** mensagens.")
-            return
-        await ctx.channel.purge(limit=quantidade + 1)
-        msg = await ctx.send(f"**{quantidade}** mensagens apagadas.")
-        await msg.delete(delay=3)
+    # -------- EMBEDS VIP --------
+    @commands.command(name="cinco_embeds")
+    async def cinco_embeds(self, ctx):
+        embeds = [
+            discord.Embed(description="# VIP 1\nPreço: 45.6K", color=0xFFFFFF),
+            discord.Embed(description="# VIP 2\nPreço: 50K", color=0xFFFFFF),
+            discord.Embed(description="# VIP 3\nPreço: 58.5K", color=0xFFFFFF),
+            discord.Embed(description="# VIP 4\nPreço: 65.1K", color=0xFFFFFF),
+            discord.Embed(description="# VIP 5\nPreço: 70K", color=0xFFFFFF),
+        ]
+        for e in embeds:
+            await ctx.send(embed=e)
 
-    # /ping
-    @commands.hybrid_command(name="ping", description="Mostra a latência do bot")
-    async def ping(self, ctx: commands.Context):
-        latencia = round(self.bot.latency * 1000)
-        await ctx.send(f"Meu tempo de resposta é de {latencia} ms.")
-
-    # /avatar
-    @commands.hybrid_command(name="avatar", description="Mostra o avatar de um usuário")
-    async def avatar(self, ctx: commands.Context, usuario: discord.Member = None):
-        usuario = usuario or ctx.author
-        embed = discord.Embed(title=f"Avatar de {usuario.name}", color=discord.Color.blurple())
-        embed.set_image(url=usuario.display_avatar.url)
-        await ctx.send(embed=embed)
-
-    # /userinfo
-    @commands.hybrid_command(name="userinfo", description="Mostra informações de um usuário")
-    async def userinfo(self, ctx: commands.Context, usuario: discord.Member = None):
-        usuario = usuario or ctx.author
-        roles = [role.mention for role in usuario.roles[1:]]
-
-        # 🔍 Busca stats na DB
-        stats = get_stats(usuario.id)
-
-        if stats:
-            messages = stats.get("mensagens", 0)
-            segundos = stats.get("tempo_call", 0)
-            hours = segundos // 3600
-            minutes = (segundos % 3600) // 60
-            tempo = f"{hours}h {minutes}min"
-        else:
-            messages = 0
-            tempo = "0h 0min"
-
+    # -------- TELLONYM --------
+    @commands.command(name="painel_tellonym")
+    @commands.has_permissions(administrator=True)
+    async def painel_tellonym(self, ctx):
         embed = discord.Embed(
-            title=f"Informações de {usuario.name}",
-            color=discord.Color.blue()
-        )
-        embed.set_thumbnail(url=usuario.display_avatar.url)
-        embed.add_field(name="ID", value=usuario.id, inline=True)
-        embed.add_field(name="Nickname", value=usuario.nick or "Nenhum", inline=True)
-        embed.add_field(name="Conta Criada", value=usuario.created_at.strftime("%d/%m/%Y"), inline=True)
-        embed.add_field(name="Entrou no Servidor", value=usuario.joined_at.strftime("%d/%m/%Y"), inline=True)
-        embed.add_field(name=f"Cargos ({len(roles)})", value=" ".join(roles) if roles else "Nenhum", inline=False)
-
-        # ⭐ Stats
-        embed.add_field(name="Mensagens", value=str(messages), inline=True)
-        embed.add_field(name="Tempo ativo", value=tempo, inline=True)
-
-        await ctx.send(embed=embed)
-
-    # /serverinfo
-    @commands.hybrid_command(name="serverinfo", description="Mostra informações do servidor")
-    async def serverinfo(self, ctx: commands.Context):
-        guild = ctx.guild
-        membros = guild.member_count
-        bots = len([m for m in guild.members if m.bot])
-        canais = len(guild.channels)
-        categorias = len(guild.categories)
-        faltando = max(0, 1000 - membros)
-
-        embed = discord.Embed(
-            title=f"Informações do Servidor: {guild.name}",
-            color=discord.Color.blurple()
-        )
-        embed.add_field(name="Canais", value=canais, inline=True)
-        embed.add_field(name="Categorias", value=categorias, inline=True)
-        embed.add_field(name="Bots", value=bots, inline=True)
-        embed.add_field(name="Membros", value=membros, inline=True)
-        embed.add_field(name="Meta de 1000 membros", value=f"Faltam **{faltando}** membros", inline=False)
-
-        if guild.icon:
-            embed.set_thumbnail(url=guild.icon.url)
-        if guild.banner:
-            embed.set_image(url=guild.banner.url)
-
-        await ctx.send(embed=embed)
-
-    # /help
-    @commands.hybrid_command(name="help", description="Mostra informações do bot")
-    async def help(self, ctx: commands.Context):
-        embed = discord.Embed(
-            title="Comandos Disponíveis",
-            description=(
-                "/ship, /mute, /ban, /expulsar, /afk, /assumir, /painel, /avatar, /help, /casar, /namorar, /beijar, "
-                "/limpar, /lembrete, /presentear, /ping, /restaurar, /warn, /userinfo, /serverinfo, /numero"
-            ),
+            title="Tellonym",
+            description="Envie mensagens anônimas clicando no botão abaixo.",
             color=0xFFFFFF
         )
-        embed.set_footer(text="Cada sistema do bot tem a assinatura do Salvador. Fazer um bot desses NÃO é fácil!")
-        await ctx.send(embed=embed)
+        await ctx.send(embed=embed, view=TellonymView())
 
+    # -------- PRIMEIRA DAMA --------
+    @commands.command()
+    async def primeiradama(self, ctx):
+        embed = discord.Embed(
+            title="Primeira Dama",
+            description="Clique no botão para resgatar.",
+            color=0xFFFFFF
+        )
+        await ctx.send(embed=embed, view=PrimeiraDamaView(self.bot))
 
+    # -------- AFK --------
+    @commands.hybrid_command(name="afk")
+    async def afk(self, ctx, *, motivo="AFK"):
+        self.afk_users[ctx.author.id] = motivo
+        await ctx.send(f"AFK ativado: **{motivo}**")
+
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        if message.author.bot:
+            return
+
+        if message.author.id in self.afk_users:
+            del self.afk_users[message.author.id]
+
+        for user in message.mentions:
+            if user.id in self.afk_users:
+                await message.channel.send(
+                    f"{user.display_name} está AFK: **{self.afk_users[user.id]}**"
+                )
+
+    # -------- FUN --------
+    @commands.hybrid_command(name="numero")
+    async def numero(self, ctx):
+        await ctx.send(f"Número escolhido: **{random.randint(1,100)}**")
+
+    @commands.hybrid_command(name="kitar")
+    async def kitar(self, ctx):
+        frases = [
+            "kitou da realidade",
+            "kitou porque foi de base",
+            "kitou porque desinstalou o Discord",
+            "kitou porque é um favelaso subdesenvolvido",
+            "kitou porque o Kenjaku mandou",
+            "kitou porque... sei lá man, caba só kitou mermo",
+            "kit. Ou por. Que a escr. Ita tá u. Ma merd. A",
+            "kitou porque a vivi mandou, DITADURA PURA!!!!!!!!!! AHAHSHAHSSHAHAJZJAHAJSJAJA",
+            "kitou porque a aura do salva é muito forte",
+            "kitou porque a yuna não aparece mais no chat #VoltaYunaSuaCachorra",
+            "kitou porque- pera aí, se a água é transparente, porque o mar é azul? 🤔",
+            "kitou porque tá muito frio, Ô FRIO DA MOLESTA EIN",
+            "kitou porque perdeu o Tung Tung Sahur no Roube um Brainrot",
+            ]
+        await ctx.send(f"{ctx.author.mention} {random.choice(frases)}")
+
+    # -------- WELCOME --------
+    @commands.Cog.listener()
+    async def on_member_join(self, member):
+        canal = member.guild.get_channel(1410053387558322297)
+        if canal:
+            await canal.send(f"Bem-vindo(a) {member.mention}!")
+
+# =========================
+# SETUP ÚNICO
+# =========================
 async def setup(bot):
     await bot.add_cog(Utils(bot))
