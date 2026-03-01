@@ -40,7 +40,7 @@ class DualGuildBot(commands.Bot):
         # ========================
         cogs = [
             "cogs.welcome",
-            "cogs.random_number"
+            "cogs.embeds"
             # adiciona aqui só os essenciais
         ]
 
