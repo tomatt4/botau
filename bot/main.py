@@ -1,82 +1,60 @@
 import discord
-import os
 from discord.ext import commands
-from dotenv import load_dotenv
+import os
+import flask
+import threading
 
-# ========================
-# 🔐 ENV
-# ========================
-load_dotenv()
-
-TOKEN = os.getenv("DISCORD_TOKEN")
-TEST_GUILD_ID = int(os.getenv("TEST_GUILD_ID"))  # servidor de teste
-PROD_GUILD_ID = int(os.getenv("PROD_GUILD_ID"))  # servidor oficial
-
-if not TOKEN:
-    raise RuntimeError("DISCORD_TOKEN não encontrado no .env")
-
-# ========================
-# 🧠 INTENTS (mínimos e seguros)
-# ========================
+# Intents
 intents = discord.Intents.default()
 intents.message_content = True
-intents.members = True
 
-# ========================
-# 🤖 BOT
-# ========================
-class DualGuildBot(commands.Bot):
-    def __init__(self):
-        super().__init__(
-            command_prefix=",",
-            intents=intents,
-            help_command=None,
-            activity=discord.Game(name="COÉ DISCORD FUI BANIDO DA API")
-        )
+bot = commands.Bot(command_prefix="!", intents=intents)
 
-    async def setup_hook(self):
-        # ========================
-        # 📦 LOAD SEGURO DOS COGS
-        # ========================
-        cogs = [
-            "cogs.welcome",
-            "cogs.moderation"
-            # adiciona aqui só os essenciais
-        ]
+# =========================
+# SERVIDOR FLASK
+# =========================
 
-        for ext in cogs:
-            try:
-                await self.load_extension(ext)
-                print(f"[OK] {ext}")
-            except Exception as e:
-                print(f"[ERRO] {ext} → {e}")
+app = flask.Flask(__name__)
 
-        # ========================
-        # 🎫 VIEW PERSISTENTE
-        # ========================
-        try:
-            from cogs.tickets import TicketView
-            self.add_view(TicketView())
-            print("[OK] TicketView persistente registrada")
-        except Exception as e:
-            print(f"[ERRO] TicketView → {e}")
+@app.route("/")
+def home():
+    return "Bot está online!"
 
-        # ========================
-        # 🔁 SLASH COMMANDS
-        # ========================
-        # 🧪 TESTE → sempre
-        await self.tree.sync(guild=discord.Object(id=TEST_GUILD_ID))
-        print("[OK] Slash sync no servidor de TESTE")
+def run_flask():
+    app.run(host="0.0.0.0", port=8080)
 
-        # 🏭 PRODUÇÃO → só quando mudar comandos
-        # await self.tree.sync(guild=discord.Object(id=PROD_GUILD_ID))
+def keep_alive():
+    t = threading.Thread(target=run_flask)
+    t.start()
 
-    async def on_ready(self):
-        print(f"Conectado como {self.user}")
-        print("Bot pronto 🚀")
+# =========================
+# EVENTOS
+# =========================
 
-# ========================
-# 🚀 START
-# ========================
-bot = DualGuildBot()
-bot.run(TOKEN)
+@bot.event
+async def on_ready():
+    print(f"Logado como {bot.user}")
+    print("Bot online!")
+
+# =========================
+# CARREGAR COGS
+# =========================
+
+async def load_cogs():
+    for file in os.listdir("./cogs"):
+        if file.endswith(".py"):
+            await bot.load_extension(f"cogs.{file[:-3]}")
+
+# =========================
+# INICIAR BOT
+# =========================
+
+async def main():
+    async with bot:
+        await load_cogs()
+        await bot.start(os.getenv("DISCORD_TOKEN"))
+
+keep_alive()
+
+import asyncio
+asyncio.run(main())
