@@ -43,7 +43,7 @@ async def on_ready():
 # =========================
 
 async def load_cogs():
-    for file in os.listdir("./cogs"):
+    for file in os.listdir("bot/cogs"):
         if file.endswith(".py"):
             await bot.load_extension(f"cogs.{file[:-3]}")
 
