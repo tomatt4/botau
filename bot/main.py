@@ -4,6 +4,8 @@ import os
 import flask
 import threading
 import db  # banco de dados
+from flask import Flask
+from threading import Thread
 
 # Intents
 intents = discord.Intents.default()
