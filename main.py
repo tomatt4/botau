@@ -1,10 +1,7 @@
 import discord
 from discord.ext import commands
 import os
-import flask
-import threading
-from flask import Flask
-from threading import Thread
+from keep_alive import keep_alive
 import random
 from discord.ext import tasks
 
@@ -23,23 +20,6 @@ status_list = [
 async def trocar_status():
     await bot.change_presence(status=discord.Status.idle, activity=discord.CustomActivity(name=random.choice(status_list)))
     
-# =========================
-# SERVIDOR FLASK
-# =========================
-
-app = flask.Flask(__name__)
-
-@app.route("/")
-def home():
-    return "Bot está online!"
-
-def run_flask():
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
-
-def keep_alive():
-    t = threading.Thread(target=run_flask)
-    t.start()
-
 # =========================
 # EVENTOS
 # =========================
@@ -73,6 +53,10 @@ async def load_cogs():
 
 async def main():
     async with bot:
+        keep_alive(bot)
         await load_cogs()
-        keep_alive()
         await bot.start(os.getenv("DISCORD_TOKEN"))
+
+import asyncio
+
+asyncio.run(main())
