@@ -38,6 +38,13 @@ async def on_ready():
     print(f"Logado como {bot.user}")
     print("Bot online!")
 
+    try:
+        synced = await bot.tree.sync()
+        print(f"✅ Slash commands sincronizados: {len(synced)}")
+        print("📜 Comandos:", [cmd.name for cmd in synced])
+    except Exception as e:
+        print(f"❌ Erro ao sincronizar comandos: {e}")
+
 # =========================
 # CARREGAR COGS
 # =========================
