@@ -3,7 +3,6 @@ from discord.ext import commands
 import os
 import flask
 import threading
-import db  # banco de dados
 from flask import Flask
 from threading import Thread
 
@@ -36,7 +35,6 @@ def keep_alive():
 
 @bot.event
 async def on_ready():
-    db.init_db()  # cria a tabela tickets automaticamente
     print(f"Logado como {bot.user}")
     print("Bot online!")
 
