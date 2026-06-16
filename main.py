@@ -40,6 +40,9 @@ async def on_ready():
         print("📜 Comandos:", [cmd.name for cmd in synced])
     except Exception as e:
         print(f"❌ Erro ao sincronizar comandos: {e}")
+        
+    if not trocar_status.is_running():
+        trocar_status.start()
 
 # =========================
 # CARREGAR COGS
