@@ -5,6 +5,8 @@ import flask
 import threading
 from flask import Flask
 from threading import Thread
+import random
+from discord.ext import tasks
 
 # Intents
 intents = discord.Intents.default()
@@ -12,6 +14,15 @@ intents.message_content = True
 
 bot = commands.Bot(command_prefix=",", intents=intents)
 
+status_list = [
+    "dis.gg/ccdv | /ia",
+    "hakari AI v1.0.2"
+]
+
+@tasks.loop(minutes=1)
+async def trocar_status():
+    await bot.change_presence(status=discord.Status.idle, activity=discord.CustomActivity(name=random.choice(status_list)))
+    
 # =========================
 # SERVIDOR FLASK
 # =========================
