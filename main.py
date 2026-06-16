@@ -5,20 +5,25 @@ from keepalive import keep_alive
 import random
 from discord.ext import tasks
 
-# Intents
-intents = discord.Intents.default()
-intents.message_content = True
-
-bot = commands.Bot(command_prefix=",", intents=intents)
-
 status_list = [
     "dis.gg/ccdv | /ia",
-    "hakari AI v1.0.2"
+    "Hakari AI v1.0.2",
+    "Assistente IA a sua disposição.",
+    "Não tenho outros comandos, apenas o /ia!",
+    "O bot principal é o Hakari#4021.",
+    "Fui feito em Python por Salva.",
+    "A API que uso é a do Groq, sabia?"
 ]
 
 @tasks.loop(minutes=1)
 async def trocar_status():
     await bot.change_presence(status=discord.Status.idle, activity=discord.CustomActivity(name=random.choice(status_list)))
+
+# Intents
+intents = discord.Intents.default()
+intents.message_content = True
+
+bot = commands.Bot(command_prefix=",", intents=intents)
     
 # =========================
 # EVENTOS
