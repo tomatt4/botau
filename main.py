@@ -74,9 +74,5 @@ async def load_cogs():
 async def main():
     async with bot:
         await load_cogs()
+        keep_alive()
         await bot.start(os.getenv("DISCORD_TOKEN"))
-
-keep_alive()
-
-import asyncio
-asyncio.run(main())
