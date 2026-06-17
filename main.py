@@ -12,7 +12,8 @@ status_list = [
     "Não tenho outros comandos, apenas o /ia!",
     "O bot principal é o Hakari#4021.",
     "Fui feito em Python por Salva.",
-    "A API que uso é a do Groq, sabia?"
+    "A API que uso é a do Groq, sabia?",
+    "O meu irmão entre aspas, porque somos bots, é o Hakari#4021."
 ]
 
 @tasks.loop(minutes=1)
