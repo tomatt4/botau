@@ -1,71 +1,40 @@
 import discord
 from discord.ext import commands
 import os
-from keep_alive import keep_alive
-import random
-from discord.ext import tasks
+import dotenv
 
-status_list = [
-    "dis.gg/ccdv | /ia",
-    "Hakari AI v1.0.2",
-    "Assistente IA a sua disposição.",
-    "Não tenho outros comandos, apenas o /ia!",
-    "O bot principal é o Hakari#4021.",
-    "Fui feito em Python por Salva.",
-    "A API que uso é a do Groq, sabia?",
-    "O meu irmão entre aspas, porque somos bots, é o Hakari#4021."
-]
+# Carregar variáveis de ambiente
+dotenv.load_dotenv()
+TOKEN = os.getenv("DISCORD_TOKEN")
 
-@tasks.loop(minutes=1)
-async def trocar_status():
-    await bot.change_presence(status=discord.Status.idle, activity=discord.CustomActivity(name=random.choice(status_list)))
-
-# Intents
+# Configuração do bot
 intents = discord.Intents.default()
 intents.message_content = True
+bot = commands.Bot(command_prefix="/", intents=intents)
 
-bot = commands.Bot(command_prefix=",", intents=intents)
-    
-# =========================
-# EVENTOS
-# =========================
-
+# Evento: Bot conectado
 @bot.event
 async def on_ready():
-    print(f"Logado como {bot.user}")
-    print("Bot online!")
-
+    print(f"{bot.user} está online!")
     try:
         synced = await bot.tree.sync()
-        print(f"✅ Slash commands sincronizados: {len(synced)}")
-        print("📜 Comandos:", [cmd.name for cmd in synced])
+        print(f"{len(synced)} comando(s) sincronizado(s)")
     except Exception as e:
-        print(f"❌ Erro ao sincronizar comandos: {e}")
-        
-    if not trocar_status.is_running():
-        trocar_status.start()
+        print(f"Erro ao sincronizar comandos: {e}")
 
-# =========================
-# CARREGAR COGS
-# =========================
-
+# Carregar cogs
 async def load_cogs():
-    base_path = os.path.join(os.path.dirname(__file__), "cogs")
+    for filename in os.listdir("./cogs"):
+        if filename.endswith(".py"):
+            await bot.load_extension(f"cogs.{filename[:-3]}")
+            print(f"Cog carregada: {filename}")
 
-    for file in os.listdir(base_path):
-        if file.endswith(".py") and file != "__init__.py":
-            await bot.load_extension(f"cogs.{file[:-3]}")
-
-# =========================
-# INICIAR BOT
-# =========================
-
+# Função para executar o bot
 async def main():
     async with bot:
-        keep_alive(bot)
         await load_cogs()
-        await bot.start(os.getenv("DISCORD_TOKEN"))
+        await bot.start(TOKEN)
 
-import asyncio
-
-asyncio.run(main())
+if __name__ == "__main__":
+    import asyncio
+    asyncio.run(main())

@@ -1,6 +1,2 @@
-python-dotenv
-discord.py
-psycopg2-binary
-flask
-pillow
-aiohttp
+discord.py==2.3.2
+python-dotenv==1.0.0
