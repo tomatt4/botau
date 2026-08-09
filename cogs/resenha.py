@@ -24,8 +24,8 @@ class Procurar(commands.Cog):
 
         # Escolhe aleatoriamente o resultado
         respostas = [
-            "✅ Resenha confirmada.",
-            "❌ Resenha tá fraca hoje."
+            "<:sim:1533126997838921808> Resenha confirmada.",
+            "<:nao:1533127054172618753> Resenha tá fraca hoje."
         ]
 
         resposta = random.choice(respostas)
