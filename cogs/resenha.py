@@ -10,7 +10,7 @@ class Procurar(commands.Cog):
         self.bot = bot
 
     @app_commands.command(
-        name="averiguar resenha",
+        name="averiguar_resenha",
         description="Computador, ligue máquina de averiguar resenha, e averigue possível resenha"
     )
     async def procurar(self, interaction: discord.Interaction):
