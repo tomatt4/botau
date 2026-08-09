@@ -11,12 +11,24 @@ except ImportError:
     print("python-dotenv não instalado. Usando variáveis de ambiente do sistema.")
 
 TOKEN = os.getenv("DISCORD_TOKEN")
+PORT = int(os.getenv("PORT", 8080))
 
 if not TOKEN:
     print("❌ ERRO: DISCORD_TOKEN não encontrado nas variáveis de ambiente!")
     print("Configure o token no arquivo .env ou na variável de ambiente DISCORD_TOKEN")
     sys.exit(1)
 
+# Criar app Flask para manter o serviço ativo no Render
+app = Flask(__name__)
+
+@app.route('/')
+def health_check():
+    return {'status': 'Bot Celestia is running'}, 200
+
+@app.route('/health')
+def health():
+    return {'status': 'ok'}, 200
+    
 # Configuração do bot
 intents = discord.Intents.default()
 intents.message_content = True
@@ -60,10 +72,19 @@ async def main():
             print(f"❌ ERRO ao iniciar bot: {e}")
             sys.exit(1)
 
+def run_flask():
+    """Executa o servidor Flask em thread separada"""
+    print(f"🚀 Servidor web rodando na porta {PORT}")
+    app.run(host='0.0.0.0', port=PORT, debug=False)
+
 if __name__ == "__main__":
-    import asyncio
+    # Inicia Flask em uma thread separada
+    flask_thread = Thread(target=run_flask, daemon=True)
+    flask_thread.start()
+    
+    # Inicia o bot Discord na thread principal
     try:
-        asyncio.run(main())
+        asyncio.run(run_bot())
     except KeyboardInterrupt:
         print("\n⏹️  Bot desligado pelo usuário")
     except Exception as e:
