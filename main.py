@@ -32,18 +32,21 @@ def health_check():
 def health():
     return {'status': 'ok'}, 200
     
-# Configuração do bot
+# Configuração do bot com suporte a prefixo "c." e "/"
 intents = discord.Intents.default()
 intents.message_content = True
-bot = commands.Bot(command_prefix="/", intents=intents)
+bot = commands.Bot(command_prefix=["c.", "/"], intents=intents)
 
 # Evento: Bot conectado
 @bot.event
 async def on_ready():
     print(f"✅ {bot.user} está online!")
     try:
+        # Sincronizar slash commands
         synced = await bot.tree.sync()
-        print(f"✅ {len(synced)} comando(s) sincronizado(s)")
+        print(f"✅ {len(synced)} comando(s) sincronizado(s) com sucesso!")
+        for cmd in synced:
+            print(f"   → {cmd.name}")
     except Exception as e:
         print(f"❌ Erro ao sincronizar comandos: {e}")
 
