@@ -14,6 +14,7 @@ class Procurar(commands.Cog):
         description="Computador, ligue máquina de averiguar resenha, e averigue possível resenha"
     )
     async def procurar(self, interaction: discord.Interaction):
+        """Comando que averigua resenha - Apenas com /averiguar resenha (sem prefixo alternativo)"""
 
         # Primeiro responde "Procurando..."
         await interaction.response.send_message("<a:carregarAnimado:1536097479840505997> Averiguando resenha...")
