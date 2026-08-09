@@ -4,6 +4,7 @@ import os
 import sys
 from flask import Flask
 from threading import Thread
+import asyncio
 
 # Carregar variáveis de ambiente
 try:
@@ -86,7 +87,7 @@ if __name__ == "__main__":
     
     # Inicia o bot Discord na thread principal
     try:
-        asyncio.run(run_bot())
+        asyncio.run(main())
     except KeyboardInterrupt:
         print("\n⏹️  Bot desligado pelo usuário")
     except Exception as e:
