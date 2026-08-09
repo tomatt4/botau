@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 import os
 import sys
+from flask import Flask
 
 # Carregar variáveis de ambiente
 try:
