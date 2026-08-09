@@ -3,6 +3,7 @@ from discord.ext import commands
 import os
 import sys
 from flask import Flask
+from threading import Thread
 
 # Carregar variáveis de ambiente
 try:
