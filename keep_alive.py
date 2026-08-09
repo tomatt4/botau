@@ -21,7 +21,7 @@ def get_ping():
 
 @app.route("/")
 def home():
-    return "Hakari AI online!"
+    return "Celestia online!"
 
 @app.route("/api/status")
 def api_status():
